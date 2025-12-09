@@ -6,10 +6,6 @@ interface DashboardShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
   title?: React.ReactNode
   subtitle?: React.ReactNode
   action?: React.ReactNode
-  /**
-   * Tailwind max-width utility for the inner container.
-   * Defaults to `max-w-6xl` for primary dashboards.
-   */
   maxWidthClassName?: string
 }
 
@@ -19,22 +15,22 @@ export function DashboardShell({
   action,
   children,
   className,
-  maxWidthClassName = "max-w-6xl",
+  maxWidthClassName = "max-w-7xl",
   ...props
 }: DashboardShellProps) {
   return (
-    <div className={cn("min-h-screen bg-background", className)} {...props}>
+    <div className={cn("min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30", className)} {...props}>
       <div
         className={cn(
-          "mx-auto px-4 py-6 md:px-8 md:py-8",
+          "mx-auto px-4 py-8 md:px-8 md:py-10",
           maxWidthClassName
         )}
       >
         {(title || subtitle || action) && (
-          <header className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+          <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               {title && (
-                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl text-gradient">
                   {title}
                 </h1>
               )}
@@ -45,7 +41,7 @@ export function DashboardShell({
               )}
             </div>
             {action && (
-              <div className="flex items-center gap-2">{action}</div>
+              <div className="flex items-center gap-3">{action}</div>
             )}
           </header>
         )}
@@ -55,4 +51,3 @@ export function DashboardShell({
     </div>
   )
 }
-
