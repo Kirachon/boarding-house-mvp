@@ -14,6 +14,9 @@ import { FinanceOverview } from '@/components/features/owner/finance-overview'
 import { QuickActions } from '@/components/features/owner/quick-actions'
 import { AnnouncementWidget } from '@/components/features/owner/announcement-widget'
 import { LeaseExpiryAlert } from '@/components/features/owner/lease-expiry-alert'
+import { ActivityTimeline } from '@/components/features/owner/activity-timeline'
+import { CalendarWidget } from '@/components/features/owner/calendar-widget'
+import { OccupancySparkline } from '@/components/features/owner/occupancy-sparkline'
 
 export default async function OwnerDashboardPage() {
     const supabase = await createClient()
@@ -25,7 +28,7 @@ export default async function OwnerDashboardPage() {
     const { data: grievances } = await supabase
         .from('grievances')
         .select('*')
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
 
     // 2. Fetch Invoices for Finance
     const { data: invoices } = await supabase
@@ -63,7 +66,7 @@ export default async function OwnerDashboardPage() {
     // Finance Calculations
     const allInvoices = invoices || []
     const totalIncome = allInvoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + Number(i.amount), 0)
-    const outstanding = allInvoices.filter(i => i.status === 'pending').reduce((sum, i) => sum + Number(i.amount), 0)
+    const outstanding = allInvoices.filter(i => i.status === 'pending' || i.status === 'unpaid').reduce((sum, i) => sum + Number(i.amount), 0)
     const overdue = allInvoices.filter(i => i.status === 'overdue').reduce((sum, i) => sum + Number(i.amount), 0)
 
     // Occupancy
@@ -76,6 +79,7 @@ export default async function OwnerDashboardPage() {
         ...item,
         tenant: Array.isArray(item.tenant) ? item.tenant[0] : item.tenant,
         room: Array.isArray(item.room) ? item.room[0] : item.room,
+        rooms: Array.isArray(item.room) ? item.room[0] : item.room, // for CalendarWidget compatibility
     }))
 
     return (
@@ -111,7 +115,9 @@ export default async function OwnerDashboardPage() {
                                 value={`${occupancyRate}%`}
                                 helperText={`${occupiedRooms}/${totalRooms} rooms occupied`}
                                 icon={<TrendingUp />}
-                            />
+                            >
+                                <OccupancySparkline rooms={rooms || []} />
+                            </MetricCard>
                             <MetricCard
                                 label="Active Issues"
                                 value={activeCount}
@@ -135,6 +141,19 @@ export default async function OwnerDashboardPage() {
 
                     {/* Right Column (1/3) - Sidebar Widgets */}
                     <div className="space-y-6">
+                        {/* NEW: Calendar Widget */}
+                        <CalendarWidget
+                            invoices={invoices || []}
+                            assignments={assignments}
+                        />
+
+                        {/* NEW: Activity Timeline */}
+                        <ActivityTimeline
+                            grievances={grievances || []}
+                            invoices={invoices || []}
+                            announcements={announcements || []}
+                        />
+
                         <LeaseExpiryAlert assignments={assignments} />
 
                         <div className="h-[300px]">

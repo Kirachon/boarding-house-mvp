@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { DarkModeToggle } from "./dark-mode-toggle"
 
 interface DashboardShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: React.ReactNode
@@ -19,7 +20,7 @@ export function DashboardShell({
   ...props
 }: DashboardShellProps) {
   return (
-    <div className={cn("min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30", className)} {...props}>
+    <div className={cn("min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800", className)} {...props}>
       <div
         className={cn(
           "mx-auto px-4 py-8 md:px-8 md:py-10",
@@ -40,9 +41,10 @@ export function DashboardShell({
                 </p>
               )}
             </div>
-            {action && (
-              <div className="flex items-center gap-3">{action}</div>
-            )}
+            <div className="flex items-center gap-3">
+              <DarkModeToggle />
+              {action}
+            </div>
           </header>
         )}
 

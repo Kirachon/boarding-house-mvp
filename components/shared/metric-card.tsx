@@ -12,6 +12,7 @@ interface MetricCardProps extends Omit<CardProps, "children"> {
   icon?: React.ReactNode
   trend?: 'up' | 'down' | 'neutral'
   trendValue?: string
+  children?: React.ReactNode
 }
 
 export function MetricCard({
@@ -21,6 +22,7 @@ export function MetricCard({
   icon,
   trend,
   trendValue,
+  children,
   className,
   ...props
 }: MetricCardProps) {
@@ -28,7 +30,7 @@ export function MetricCard({
     <Card className={cn("card-premium h-full overflow-hidden", className)} {...props}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-3">
+          <div className="space-y-3 flex-1">
             <p className="text-sm font-medium text-muted-foreground">
               {label}
             </p>
@@ -46,12 +48,19 @@ export function MetricCard({
           )}
         </div>
 
+        {/* Optional sparkline or other children */}
+        {children && (
+          <div className="mt-4">
+            {children}
+          </div>
+        )}
+
         {trend && trendValue && (
           <div className={cn(
             "mt-4 inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
-            trend === 'up' && "bg-emerald-50 text-emerald-600",
-            trend === 'down' && "bg-red-50 text-red-600",
-            trend === 'neutral' && "bg-slate-100 text-slate-600"
+            trend === 'up' && "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30",
+            trend === 'down' && "bg-red-50 text-red-600 dark:bg-red-900/30",
+            trend === 'neutral' && "bg-slate-100 text-slate-600 dark:bg-slate-800"
           )}>
             {trend === 'up' && '↑'}
             {trend === 'down' && '↓'}
