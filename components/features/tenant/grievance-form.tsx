@@ -29,7 +29,8 @@ export function GrievanceForm() {
     const form = useForm<GrievanceFormValues>({
         resolver: zodResolver(grievanceSchema),
         defaultValues: {
-            category: undefined,
+            // Preselect a sensible default to avoid empty submissions
+            category: 'maintenance',
             description: "",
         },
     })
@@ -43,10 +44,14 @@ export function GrievanceForm() {
             const result = await createGrievance(formData)
 
             if (result?.error) {
-                toast.error(result.error)
+                // Show field-specific errors if available
+                const fieldErr = result.details?.fieldErrors
+                const descErr = fieldErr?.description?.[0]
+                const catErr = fieldErr?.category?.[0]
+                toast.error(descErr || catErr || result.error)
             } else {
                 toast.success("Grievance submitted successfully")
-                form.reset()
+                form.reset({ category: 'maintenance', description: '' })
             }
         })
     }
@@ -60,7 +65,7 @@ export function GrievanceForm() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Category</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select value={field.value} onValueChange={field.onChange}>
                                 <FormControl>
                                     <SelectTrigger className="h-12">
                                         <SelectValue placeholder="Select a category" />
