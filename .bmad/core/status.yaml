@@ -1,0 +1,148 @@
+# generated: 2025-12-08
+# project: boarding_house
+# project_key: boarding_house
+# tracking_system: generic
+# story_location: d:/GitProjects/boarding_house/stories
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - drafted: Story file created in stories folder
+#   - ready-for-dev: Draft approved and story context created
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - completed: Retrospective has been done
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically drafts next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2025-12-08
+project: boarding_house
+project_key: boarding_house
+tracking_system: generic
+story_location: d:/GitProjects/boarding_house/docs/sprint-artifacts
+
+development_status:
+  # Epic 1: Project Foundation & Authentication
+  epic-1: done
+  1-1-project-initialization: done
+  1-2-authentication-role-schema: done
+  1-3-login-sign-up-ui: done
+  1-4-role-based-access-control-rbac: done
+  epic-1-retrospective: optional
+
+  # Epic 2: The Trust Loop (Tenant Experience)
+  epic-2: done
+  2-1-grievance-schema-actions: done
+  2-2-mobile-first-reporting-form: done
+  2-3-real-time-pizza-tracker: done
+  epic-2-retrospective: optional
+
+  # Epic 3: Living Inventory (Owner Experience)
+  epic-3: in-progress
+  3-1-owner-inbox-and-triage: done
+  3-2-living-inventory-dashboard: done
+  epic-3-retrospective: optional
+
+  # Epic 4: Guest Verification Portal
+  epic-4: in-progress
+  4-1-public-profile-page: done
+# generated: 2025-12-08
+# project: boarding_house
+# project_key: boarding_house
+# tracking_system: generic
+# story_location: d:/GitProjects/boarding_house/stories
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - drafted: Story file created in stories folder
+#   - ready-for-dev: Draft approved and story context created
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - completed: Retrospective has been done
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically drafts next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2025-12-08
+project: boarding_house
+project_key: boarding_house
+tracking_system: generic
+story_location: d:/GitProjects/boarding_house/docs/sprint-artifacts
+
+development_status:
+  # Epic 1: Project Foundation & Authentication
+  epic-1: done
+  1-1-project-initialization: done
+  1-2-authentication-role-schema: done
+  1-3-login-sign-up-ui: done
+  1-4-role-based-access-control-rbac: done
+  epic-1-retrospective: optional
+
+  # Epic 2: The Trust Loop (Tenant Experience)
+  epic-2: done
+  2-1-grievance-schema-actions: done
+  2-2-mobile-first-reporting-form: done
+  2-3-real-time-pizza-tracker: done
+  epic-2-retrospective: optional
+
+  # Epic 3: Living Inventory (Owner Experience)
+  epic-3: in-progress
+  3-1-owner-inbox-and-triage: done
+  3-2-living-inventory-dashboard: done
+  epic-3-retrospective: optional
+
+  # Epic 4: Guest Verification Portal
+  epic-4: in-progress
+  4-1-public-profile-page: done
+  4-2-verification-badges-availability: done
+  epic-4-retrospective: optional
+
+  # Epic 5: Core Management (Rooms & Tenants)
+  epic-5: in-progress
+  5-1-room-management-crud: done
+  5-2-tenant-onboarding-assignment: done
+  epic-5-retrospective: optional
+
+  # Epic 6: Financials (Manual MVP)
+  epic-6: done
+  6-1-manual-invoicing: done
+  6-2-payment-tracking-pl: done
+  epic-6-retrospective: optional
