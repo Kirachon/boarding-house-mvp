@@ -63,7 +63,6 @@ export default async function OwnerDashboardPage() {
                     <div className="lg:col-span-2 space-y-8">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-800 mb-4">Living Inventory</h2>
-                            {/*  @ts-expect-error - Supabase types are deep and tricky with joins sometimes, but this shape matches */}
                             <RoomHealthGrid rooms={rooms || []} />
                         </div>
                     </div>

@@ -12,10 +12,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 
+const categories = ['wifi', 'cleaning', 'maintenance', 'other'] as const
+
 const grievanceSchema = z.object({
-    category: z.enum(['wifi', 'cleaning', 'maintenance', 'other'], {
-        errorMap: () => ({ message: "Please select a category" }),
-    }),
+    category: z.enum(categories),
     description: z.string().min(10, {
         message: "Description must be at least 10 characters.",
     }),
