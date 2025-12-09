@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { AlertTriangle, Users, TrendingUp } from 'lucide-react'
+import { AlertTriangle, Users, TrendingUp, Wrench } from 'lucide-react'
 
 import { logout } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
@@ -60,6 +60,12 @@ export default async function OwnerDashboardPage() {
         .order('created_at', { ascending: false })
         .limit(5)
 
+    // 6. Fetch Work Orders (for maintenance overview)
+    const { data: workOrders } = await supabase
+        .from('work_orders')
+        .select('status')
+
+
     // Calculations
     const activeCount = grievances?.filter(g => g.status === 'open' || g.status === 'in_progress').length || 0
 
@@ -73,6 +79,10 @@ export default async function OwnerDashboardPage() {
     const totalRooms = rooms?.length || 0
     const occupiedRooms = rooms?.filter(r => r.occupancy === 'occupied').length || 0
     const occupancyRate = totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0
+
+    const openWorkOrders = (workOrders || []).filter(
+        (w) => w.status === 'open' || w.status === 'in_progress' || w.status === 'waiting_vendor'
+    ).length
 
     // Transform assignments safely
     const assignments = (assignmentData || []).map((item: any) => ({
@@ -109,7 +119,7 @@ export default async function OwnerDashboardPage() {
                     {/* Left Column (2/3) */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Property Vitals */}
-                        <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid gap-4 md:grid-cols-3">
                             <MetricCard
                                 label="Occupancy Rate"
                                 value={`${occupancyRate}%`}
@@ -123,6 +133,12 @@ export default async function OwnerDashboardPage() {
                                 value={activeCount}
                                 helperText={activeCount > 0 ? "Requires attention" : "All good"}
                                 icon={<AlertTriangle className={activeCount > 0 ? "text-amber-500" : "text-green-500"} />}
+                            />
+                            <MetricCard
+                                label="Open Work Orders"
+                                value={openWorkOrders}
+                                helperText={openWorkOrders > 0 ? "In progress with vendors" : "No active maintenance jobs"}
+                                icon={<Wrench />}
                             />
                         </div>
 

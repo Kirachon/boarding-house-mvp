@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { UserPlus, FileText, Plus, Megaphone, Search } from 'lucide-react'
+import { UserPlus, FileText, Plus, Megaphone, Search, Wrench } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
@@ -51,6 +51,12 @@ export function QuickActions() {
                     <Button className="gap-2 gradient-teal text-white shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 transition-all">
                         <Plus size={16} />
                         Add Room
+                    </Button>
+                </Link>
+                <Link href="/owner/maintenance">
+                    <Button className="gap-2 gradient-emerald text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all">
+                        <Wrench size={16} />
+                        Open Maintenance
                     </Button>
                 </Link>
 

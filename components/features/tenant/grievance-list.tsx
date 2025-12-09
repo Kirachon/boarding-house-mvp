@@ -6,10 +6,12 @@ import { Badge } from '@/components/ui/badge'
 import { Database } from '@/types/supabase'
 
 type Grievance = Database['public']['Tables']['grievances']['Row']
+type WorkOrderStatus = Database['public']['Enums']['work_order_status']
 
 interface GrievanceListProps {
     initialGrievances: Grievance[]
     userId: string
+    workOrderStatusesByGrievance?: Record<string, WorkOrderStatus>
 }
 
 const statusColorMap: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -19,7 +21,7 @@ const statusColorMap: Record<string, "default" | "secondary" | "destructive" | "
     rejected: "destructive",
 }
 
-export function GrievanceList({ initialGrievances, userId }: GrievanceListProps) {
+export function GrievanceList({ initialGrievances, userId, workOrderStatusesByGrievance }: GrievanceListProps) {
     const [grievances, setGrievances] = useState<Grievance[]>(initialGrievances)
     const supabase = createClient()
 
@@ -72,6 +74,14 @@ export function GrievanceList({ initialGrievances, userId }: GrievanceListProps)
                             </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-2">{grievance.description}</p>
+                        {workOrderStatusesByGrievance?.[grievance.id] && (
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Linked work order status:{" "}
+                                <span className="font-medium">
+                                    {workOrderStatusesByGrievance[grievance.id]!.replace('_', ' ')}
+                                </span>
+                            </p>
+                        )}
                         <p className="mt-2 text-xs text-muted-foreground">
                             Reported: {new Date(grievance.created_at).toLocaleDateString()}
                         </p>

@@ -18,6 +18,7 @@ type Notification = Database['public']['Tables']['notifications']['Row']
 export function NotificationBell() {
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [unreadCount, setUnreadCount] = useState(0)
+    const [pendingProofCount, setPendingProofCount] = useState(0)
     const [isOpen, setIsOpen] = useState(false)
     const supabase = createClient()
 
@@ -33,24 +34,36 @@ export function NotificationBell() {
                 .order('created_at', { ascending: false })
                 .limit(10)
 
+            let baseUnread = 0
             if (data) {
                 setNotifications(data)
-                setUnreadCount(data.filter(n => !n.is_read).length)
+                baseUnread = data.filter(n => !n.is_read).length
+            }
+
+            // For owners, also surface number of payment proofs pending verification
+            const role = (user.user_metadata as any)?.role
+            if (role === 'owner') {
+                const { data: pending } = await supabase
+                    .from('invoices')
+                    .select('id')
+                    .eq('status', 'pending_verification')
+
+                const extra = pending?.length ?? 0
+                setPendingProofCount(extra)
+                setUnreadCount(baseUnread + extra)
+            } else {
+                setPendingProofCount(0)
+                setUnreadCount(baseUnread)
             }
         }
 
         fetchNotifications()
 
-        // Subscribe to real-time changes
-        // Note: Enabling realtime requires extra config on the table in Supabase (Publications)
-        // For now, we'll just stick to polling or fetch-on-mount + maybe a refresh interval
-        const interval = setInterval(fetchNotifications, 60000) // Poll every min
-
+        const interval = setInterval(fetchNotifications, 60000)
         return () => clearInterval(interval)
     }, [])
 
     const markAsRead = async (id: string) => {
-        // Optimistic update
         setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
         setUnreadCount(prev => Math.max(0, prev - 1))
 
@@ -62,7 +75,6 @@ export function NotificationBell() {
 
     const markAllRead = async () => {
         setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
-        setUnreadCount(0)
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
             await supabase
@@ -71,6 +83,8 @@ export function NotificationBell() {
                 .eq('user_id', user.id)
                 .eq('is_read', false)
         }
+        // Only clear unread notifications, keep pendingProofCount contribution
+        setUnreadCount(pendingProofCount)
     }
 
     return (
@@ -93,13 +107,20 @@ export function NotificationBell() {
                     )}
                 </div>
                 <ScrollArea className="h-[300px]">
-                    {notifications.length === 0 ? (
+                    {notifications.length === 0 && pendingProofCount === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full p-4 text-center text-muted-foreground">
                             <Bell className="h-8 w-8 mb-2 opacity-20" />
                             <p className="text-sm">No notifications</p>
                         </div>
                     ) : (
                         <div className="divide-y">
+                            {pendingProofCount > 0 && (
+                                <div className="p-4 bg-blue-50/60 dark:bg-blue-900/10 text-xs text-blue-700">
+                                    You have {pendingProofCount} payment proof
+                                    {pendingProofCount > 1 ? 's' : ''} pending verification in
+                                    the Financials tab.
+                                </div>
+                            )}
                             {notifications.map((notification) => (
                                 <div
                                     key={notification.id}

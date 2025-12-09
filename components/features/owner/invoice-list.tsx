@@ -64,10 +64,29 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
         }
     }
 
+    const pendingVerification = invoices.filter(i => i.status === 'pending_verification')
+    const overdue = invoices.filter(i => i.status === 'overdue')
+    const unpaid = invoices.filter(i => i.status === 'unpaid')
+
+    const sections: { label: string; data: Invoice[] }[] = [
+        { label: 'Needs review (proof uploaded)', data: pendingVerification },
+        { label: 'Overdue', data: overdue },
+        { label: 'Unpaid', data: unpaid },
+        { label: 'All invoices', data: invoices },
+    ]
+
     return (
         <Card className="card-premium overflow-hidden border-0 bg-white/50 backdrop-blur-sm">
-            <CardContent className="p-0">
-                <Table>
+            <CardContent className="p-0 space-y-6">
+                {sections.map(({ label, data }, idx) => (
+                    <div key={label}>
+                        <div className="flex items-center justify-between px-6 pt-4 pb-2">
+                            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                                {label}
+                            </h3>
+                            <span className="text-xs text-muted-foreground">{data.length}</span>
+                        </div>
+                        <Table>
                     <TableHeader>
                         <TableRow className="hover:bg-transparent border-b border-border/50">
                             <TableHead className="w-[200px] pl-6">Tenant</TableHead>
@@ -79,17 +98,21 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {invoices.length === 0 ? (
+                        {data.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground text-xs">
                                     <div className="flex flex-col items-center justify-center gap-2">
-                                        <p>No invoices found</p>
-                                        <p className="text-xs text-muted-foreground/60">Generate a new invoice to get started</p>
+                                        <p>No records in this view.</p>
+                                        {idx === sections.length - 1 && (
+                                            <p className="text-xs text-muted-foreground/60">
+                                                Generate a new invoice to get started.
+                                            </p>
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            invoices.map((invoice) => (
+                            data.map((invoice) => (
                                 <TableRow key={invoice.id} className="group hover:bg-muted/30 border-b border-border/40 transition-colors">
                                     <TableCell className="font-medium pl-6">
                                         <div className="flex items-center gap-2">
@@ -145,6 +168,8 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                         )}
                     </TableBody>
                 </Table>
+                    </div>
+                ))}
             </CardContent>
         </Card>
     )

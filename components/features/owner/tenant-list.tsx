@@ -20,6 +20,11 @@ import { Card, CardContent } from '@/components/ui/card'
 type Assignment = Database['public']['Tables']['tenant_room_assignments']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'] | null
     rooms: Database['public']['Tables']['rooms']['Row'] | null
+    room_handover_checklists?: {
+        type: string
+        is_completed: boolean
+        completed_at: string | null
+    }[]
 }
 
 interface TenantListProps {
@@ -45,6 +50,7 @@ export function TenantList({ assignments }: TenantListProps) {
                             <TableHead className="w-[300px] pl-6">Tenant</TableHead>
                             <TableHead>Assigned Room</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Checklist</TableHead>
                             <TableHead>Joined</TableHead>
                             <TableHead className="text-right pr-6">Actions</TableHead>
                         </TableRow>
@@ -90,6 +96,24 @@ export function TenantList({ assignments }: TenantListProps) {
                                         <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-none px-2 py-0.5">
                                             Active Lease
                                         </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        {(() => {
+                                            const checklistArray = assignment.room_handover_checklists || []
+                                            const moveIn = checklistArray.find(c => c.type === 'move_in')
+                                            if (moveIn?.is_completed) {
+                                                return (
+                                                    <span className="text-xs text-emerald-700 bg-emerald-50 rounded-full px-2 py-0.5">
+                                                        Move-in confirmed
+                                                    </span>
+                                                )
+                                            }
+                                            return (
+                                                <span className="text-xs text-amber-700 bg-amber-50 rounded-full px-2 py-0.5">
+                                                    Awaiting move-in checklist
+                                                </span>
+                                            )
+                                        })()}
                                     </TableCell>
                                     <TableCell className="text-sm text-muted-foreground">
                                         {new Date(assignment.created_at).toLocaleDateString()}

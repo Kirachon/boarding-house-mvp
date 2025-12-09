@@ -15,13 +15,14 @@ export default async function TenantManagementPage() {
 
     if (!user) redirect('/login')
 
-    // Fetch active assignments
+    // Fetch active assignments with profile, room, and latest handover status
     const { data: assignments } = await supabase
         .from('tenant_room_assignments')
         .select(`
         *,
         profiles!inner(*),
-        rooms!inner(*)
+        rooms!inner(*),
+        room_handover_checklists!left(type, is_completed, completed_at)
     `)
         .eq('is_active', true)
         .order('created_at', { ascending: false })

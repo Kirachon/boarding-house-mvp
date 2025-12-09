@@ -291,6 +291,63 @@ export type Database = {
                     },
                 ]
             }
+            documents: {
+                Row: {
+                    id: string
+                    tenant_id: string | null
+                    title: string
+                    type: string
+                    file_url: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    tenant_id?: string | null
+                    title: string
+                    type: string
+                    file_url: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    tenant_id?: string | null
+                    title?: string
+                    type?: string
+                    file_url?: string
+                    created_at?: string
+                }
+                Relationships: []
+            }
+            vendors: {
+                Row: {
+                    id: string
+                    name: string
+                    phone: string | null
+                    email: string | null
+                    services: string | null
+                    notes: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    phone?: string | null
+                    email?: string | null
+                    services?: string | null
+                    notes?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    phone?: string | null
+                    email?: string | null
+                    services?: string | null
+                    notes?: string | null
+                    created_at?: string
+                }
+                Relationships: []
+            }
             tenant_room_assignments: {
                 Row: {
                     created_at: string
@@ -330,10 +387,103 @@ export type Database = {
                         foreignKeyName: "tenant_room_assignments_room_id_fkey"
                         columns: ["room_id"]
                         isOneToOne: false
-                        referencedRelation: "rooms"
-                        referencedColumns: ["id"]
+                    referencedRelation: "rooms"
+                    referencedColumns: ["id"]
                     },
                 ]
+            }
+            work_orders: {
+                Row: {
+                    id: string
+                    grievance_id: string | null
+                    room_id: string | null
+                    tenant_id: string | null
+                    vendor_id: string | null
+                    title: string
+                    description: string | null
+                    priority: Database["public"]["Enums"]["work_order_priority"]
+                    status: Database["public"]["Enums"]["work_order_status"]
+                    scheduled_date: string | null
+                    due_date: string | null
+                    completed_at: string | null
+                    labor_cost: number | null
+                    materials_cost: number | null
+                    total_cost: number | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    grievance_id?: string | null
+                    room_id?: string | null
+                    tenant_id?: string | null
+                    vendor_id?: string | null
+                    title: string
+                    description?: string | null
+                    priority?: Database["public"]["Enums"]["work_order_priority"]
+                    status?: Database["public"]["Enums"]["work_order_status"]
+                    scheduled_date?: string | null
+                    due_date?: string | null
+                    completed_at?: string | null
+                    labor_cost?: number | null
+                    materials_cost?: number | null
+                    total_cost?: number | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    grievance_id?: string | null
+                    room_id?: string | null
+                    tenant_id?: string | null
+                    vendor_id?: string | null
+                    title?: string
+                    description?: string | null
+                    priority?: Database["public"]["Enums"]["work_order_priority"]
+                    status?: Database["public"]["Enums"]["work_order_status"]
+                    scheduled_date?: string | null
+                    due_date?: string | null
+                    completed_at?: string | null
+                    labor_cost?: number | null
+                    materials_cost?: number | null
+                    total_cost?: number | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: []
+            }
+            room_handover_checklists: {
+                Row: {
+                    id: string
+                    tenant_id: string
+                    room_id: string | null
+                    type: string
+                    is_completed: boolean
+                    notes: string | null
+                    created_at: string
+                    completed_at: string | null
+                }
+                Insert: {
+                    id?: string
+                    tenant_id: string
+                    room_id?: string | null
+                    type: string
+                    is_completed?: boolean
+                    notes?: string | null
+                    created_at?: string
+                    completed_at?: string | null
+                }
+                Update: {
+                    id?: string
+                    tenant_id?: string
+                    room_id?: string | null
+                    type?: string
+                    is_completed?: boolean
+                    notes?: string | null
+                    created_at?: string
+                    completed_at?: string | null
+                }
+                Relationships: []
             }
         }
         Views: {
@@ -348,6 +498,8 @@ export type Database = {
             invoice_status: "unpaid" | "paid" | "overdue" | "cancelled" | "pending_verification"
             item_condition: "good" | "fair" | "poor" | "broken"
             room_occupancy: "vacant" | "occupied" | "maintenance"
+            work_order_status: "open" | "in_progress" | "waiting_vendor" | "completed" | "cancelled"
+            work_order_priority: "low" | "medium" | "high"
             user_role: "owner" | "tenant" | "guest" | "admin"
         }
         CompositeTypes: {

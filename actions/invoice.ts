@@ -104,9 +104,20 @@ export async function verifyPayment(invoiceId: string, approved: boolean) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user || user.user_metadata.role !== 'owner') return { error: 'Unauthorized' }
 
+    // Fetch invoice to notify the correct tenant
+    const { data: invoice, error: fetchError } = await supabase
+        .from('invoices')
+        .select('tenant_id, description, amount')
+        .eq('id', invoiceId)
+        .single()
+
+    if (fetchError || !invoice) {
+        return { error: fetchError?.message || 'Invoice not found' }
+    }
+
     const updates = approved
         ? { status: 'paid' }
-        : { status: 'unpaid' } // Reverting to unpaid, maybe we keep the proof url or clear it? Keeping it allows seeing history maybe.
+        : { status: 'unpaid' } // Reverting to unpaid, keep proof URL for history
 
     // If rejected, we might want to clear the proof URL so they can upload again, or keep it as record?
     // Let's keep it simple: if rejected, set to unpaid, keep URL (so they see what they uploaded), 
@@ -118,6 +129,19 @@ export async function verifyPayment(invoiceId: string, approved: boolean) {
         .eq('id', invoiceId)
 
     if (error) return { error: error.message }
+
+    // Create a notification for the tenant so they see the result
+    const title = approved ? 'Payment verified' : 'Payment not verified'
+    const message = approved
+        ? `Your payment for "${invoice.description}" has been verified and marked as paid.`
+        : `Your payment proof for "${invoice.description}" could not be verified. The invoice is still marked as unpaid.`
+
+    await supabase.from('notifications').insert({
+        user_id: invoice.tenant_id,
+        title,
+        message,
+        type: approved ? 'success' : 'warning',
+    } as any)
 
     revalidatePath('/owner/finance')
     return { success: true }
