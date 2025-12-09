@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createRoom, updateRoom } from '@/actions/room'
 import { toast } from 'sonner'
-import { Plus } from 'lucide-react'
+import { Plus, Home } from 'lucide-react'
 import { Database } from '@/types/supabase'
 
 type Room = Database['public']['Tables']['rooms']['Row']
@@ -54,32 +54,68 @@ export function RoomDialog({ mode, room, open, onOpenChange, trigger }: RoomDial
     return (
         <Dialog open={show} onOpenChange={setShow}>
             <DialogTrigger asChild>
-                {trigger || <Button><Plus className="w-4 h-4 mr-2" /> Add Room</Button>}
+                {trigger || (
+                    <Button className="gradient-teal text-white shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30 transition-all">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Room
+                    </Button>
+                )}
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>{mode === 'create' ? 'Add New Room' : 'Edit Room'}</DialogTitle>
+                    <DialogTitle className="flex items-center gap-2 text-xl">
+                        <div className="h-8 w-8 rounded-lg gradient-teal flex items-center justify-center">
+                            <Home className="h-4 w-4 text-white" />
+                        </div>
+                        {mode === 'create' ? 'Add New Room' : 'Edit Room'}
+                    </DialogTitle>
                     <DialogDescription>
                         Configure the room details below.
                     </DialogDescription>
                 </DialogHeader>
-                <form action={handleSubmit} className="space-y-4">
+                <form action={handleSubmit} className="space-y-4 pt-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Room Name / Number</Label>
-                        <Input id="name" name="name" defaultValue={room?.name} required placeholder="e.g. Room 101" />
+                        <Input
+                            id="name"
+                            name="name"
+                            defaultValue={room?.name}
+                            required
+                            placeholder="e.g. Room 101"
+                            className="h-10"
+                        />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="price">Price (Monthly)</Label>
-                            <Input id="price" name="price" type="number" step="0.01" defaultValue={room?.price} required />
+                            <Input
+                                id="price"
+                                name="price"
+                                type="number"
+                                step="0.01"
+                                defaultValue={room?.price}
+                                required
+                                className="h-10 font-mono"
+                            />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="capacity">Capacity (Pax)</Label>
-                            <Input id="capacity" name="capacity" type="number" min="1" defaultValue={room?.capacity} required />
+                            <Input
+                                id="capacity"
+                                name="capacity"
+                                type="number"
+                                min="1"
+                                defaultValue={room?.capacity}
+                                required
+                                className="h-10"
+                            />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button type="submit">{mode === 'create' ? 'Create Room' : 'Save Changes'}</Button>
+                    <DialogFooter className="pt-4">
+                        <Button type="button" variant="ghost" onClick={() => setShow(false)}>Cancel</Button>
+                        <Button type="submit" className="gradient-teal text-white">
+                            {mode === 'create' ? 'Create Room' : 'Save Changes'}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

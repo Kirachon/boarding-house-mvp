@@ -12,9 +12,10 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Database } from '@/types/supabase'
-import { LogOut } from 'lucide-react'
+import { LogOut, Home, UserCircle2 } from 'lucide-react'
 import { removeTenant } from '@/actions/tenant'
 import { toast } from 'sonner'
+import { Card, CardContent } from '@/components/ui/card'
 
 type Assignment = Database['public']['Tables']['tenant_room_assignments']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'] | null
@@ -36,61 +37,80 @@ export function TenantList({ assignments }: TenantListProps) {
     }
 
     return (
-        <div className="rounded-md border border-border bg-card">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Tenant</TableHead>
-                        <TableHead>Assigned Room</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Joined</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {assignments.length === 0 ? (
-                        <TableRow>
-                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                No active tenants found. Invite one above.
-                            </TableCell>
+        <Card className="card-premium overflow-hidden border-0 bg-white/50 backdrop-blur-sm">
+            <CardContent className="p-0">
+                <Table>
+                    <TableHeader>
+                        <TableRow className="hover:bg-transparent border-b border-border/50">
+                            <TableHead className="w-[300px] pl-6">Tenant</TableHead>
+                            <TableHead>Assigned Room</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Joined</TableHead>
+                            <TableHead className="text-right pr-6">Actions</TableHead>
                         </TableRow>
-                    ) : (
-                        assignments.map((assignment) => (
-                            <TableRow key={assignment.id}>
-                                <TableCell className="flex items-center gap-3">
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarFallback>{assignment.profiles?.full_name?.substring(0, 2) || 'T'}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-medium text-sm">{assignment.profiles?.full_name || 'Unknown'}</p>
+                    </TableHeader>
+                    <TableBody>
+                        {assignments.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                                            <UserCircle2 className="h-5 w-5 text-muted-foreground" />
+                                        </div>
+                                        <p>No active tenants found. Invite one above.</p>
                                     </div>
                                 </TableCell>
-                                <TableCell className="font-medium">
-                                    {assignment.rooms?.name || 'Unassigned'}
-                                </TableCell>
-                                <TableCell>
-                                    <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-                                        Active
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-sm text-muted-foreground">
-                                    {new Date(assignment.start_date).toLocaleDateString()}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                        onClick={() => assignment.rooms && handleRemove(assignment.id, assignment.rooms.id)}
-                                    >
-                                        <LogOut className="w-4 h-4 mr-2" />
-                                        Evict
-                                    </Button>
-                                </TableCell>
                             </TableRow>
-                        )))}
-                </TableBody>
-            </Table>
-        </div>
+                        ) : (
+                            assignments.map((assignment) => (
+                                <TableRow key={assignment.id} className="group hover:bg-muted/30 border-b border-border/40 transition-colors">
+                                    <TableCell className="pl-6">
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
+                                                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-medium">
+                                                    {assignment.profiles?.full_name?.substring(0, 2).toUpperCase() || 'T'}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <p className="font-semibold text-sm text-foreground">{assignment.profiles?.full_name || 'Unknown'}</p>
+                                                <p className="text-xs text-muted-foreground">ID: {assignment.profiles?.id.slice(0, 8)}</p>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="font-medium">
+                                        {assignment.rooms && (
+                                            <div className="flex items-center gap-2 text-slate-700">
+                                                <Home className="w-4 h-4 text-slate-400" />
+                                                {assignment.rooms.name}
+                                            </div>
+                                        )}
+                                        {!assignment.rooms && <span className="text-muted-foreground italic">Unassigned</span>}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-none px-2 py-0.5">
+                                            Active Lease
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-sm text-muted-foreground">
+                                        {new Date(assignment.created_at).toLocaleDateString()}
+                                    </TableCell>
+                                    <TableCell className="text-right pr-6">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            onClick={() => assignment.rooms && handleRemove(assignment.id, assignment.rooms.id)}
+                                        >
+                                            <LogOut className="w-4 h-4 mr-2" />
+                                            End Lease
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
     )
 }

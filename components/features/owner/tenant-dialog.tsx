@@ -61,30 +61,51 @@ export function TenantDialog({ rooms }: TenantDialogProps) {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button><UserPlus className="w-4 h-4 mr-2" /> Invite Tenant</Button>
+                <Button className="gradient-blue text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Invite Tenant
+                </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Invite New Tenant</DialogTitle>
+                    <DialogTitle className="flex items-center gap-2 text-xl">
+                        <div className="h-8 w-8 rounded-lg gradient-blue flex items-center justify-center">
+                            <UserPlus className="h-4 w-4 text-white" />
+                        </div>
+                        Invite New Tenant
+                    </DialogTitle>
                     <DialogDescription>
                         Create an account for a new tenant and assign them a room.
                     </DialogDescription>
                 </DialogHeader>
 
                 {!createdUser ? (
-                    <form action={handleSubmit} className="space-y-4">
+                    <form action={handleSubmit} className="space-y-4 pt-4">
                         <div className="space-y-2">
                             <Label htmlFor="full_name">Full Name</Label>
-                            <Input id="full_name" name="full_name" required placeholder="John Doe" />
+                            <Input
+                                id="full_name"
+                                name="full_name"
+                                required
+                                placeholder="John Doe"
+                                className="h-10"
+                            />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" name="email" type="email" required placeholder="john@example.com" />
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                placeholder="john@example.com"
+                                className="h-10"
+                            />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="room_id">Assign Room</Label>
                             <Select name="room_id" required>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-10">
                                     <SelectValue placeholder="Select a vacant room" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -100,24 +121,31 @@ export function TenantDialog({ rooms }: TenantDialogProps) {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <DialogFooter>
-                            <Button type="submit">Send Invite</Button>
+                        <DialogFooter className="pt-4">
+                            <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+                            <Button type="submit" className="gradient-blue text-white">Send Invite</Button>
                         </DialogFooter>
                     </form>
                 ) : (
                     <div className="space-y-4 py-4">
-                        <div className="bg-green-50 p-4 rounded-md border border-green-200 text-center">
-                            <h3 className="text-green-800 font-bold mb-2">Tenant Created!</h3>
-                            <p className="text-sm text-green-700 mb-4">
-                                Since email is disabled in dev, please share these credentials manually:
+                        <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100 text-center shadow-inner">
+                            <h3 className="text-emerald-800 font-bold mb-2 text-lg">Tenant Account Created!</h3>
+                            <p className="text-sm text-emerald-700 mb-6">
+                                The account has been set up successfully. Share these credentials with the tenant:
                             </p>
-                            <div className="text-left bg-white p-3 rounded border text-sm font-mono">
-                                <p>Email: <strong>{createdUser.email}</strong></p>
-                                <p>Password: <strong>{createdUser.pass}</strong></p>
+                            <div className="text-left bg-white p-4 rounded-lg border border-emerald-100 shadow-sm text-sm font-mono space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Email:</span>
+                                    <strong className="select-all">{createdUser.email}</strong>
+                                </div>
+                                <div className="flex justify-between border-t pt-2 mt-2">
+                                    <span className="text-muted-foreground">Temp Password:</span>
+                                    <strong className="select-all text-emerald-600">{createdUser.pass}</strong>
+                                </div>
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button onClick={handleClose}>Done</Button>
+                            <Button onClick={handleClose} className="w-full">Done</Button>
                         </DialogFooter>
                     </div>
                 )}
