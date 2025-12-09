@@ -1,10 +1,13 @@
+import Link from 'next/link'
+import { ChevronLeft } from 'lucide-react'
+
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+
 import { Button } from '@/components/ui/button'
 import { TenantList } from '@/components/features/owner/tenant-list'
 import { TenantDialog } from '@/components/features/owner/tenant-dialog'
-import { ChevronLeft } from 'lucide-react'
-import Link from 'next/link'
+import { DashboardShell } from '@/components/shared/dashboard-shell'
 
 export default async function TenantManagementPage() {
     const supabase = await createClient()
@@ -30,20 +33,29 @@ export default async function TenantManagementPage() {
     // The join type in supabase-js can be tricky. We'll cast in props if needed.
 
     return (
-        <div className="min-h-screen p-8 bg-gray-50">
-            <div className="max-w-5xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
-                    <div className="flex items-center gap-4">
-                        <Link href="/owner/dashboard">
-                            <Button variant="ghost" size="icon"><ChevronLeft className="w-5 h-5" /></Button>
-                        </Link>
-                        <h1 className="text-3xl font-bold text-gray-900">Tenant Roster</h1>
-                    </div>
-                    <TenantDialog rooms={rooms || []} />
-                </div>
-
-                <TenantList assignments={assignments || []} />
+        <DashboardShell
+            title="Tenant roster"
+            subtitle="View active assignments and manage tenant room allocation."
+            maxWidthClassName="max-w-5xl"
+            action={(
+                <TenantDialog rooms={rooms || []} />
+            )}
+        >
+            <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <Link href="/owner/dashboard">
+                    <Button variant="ghost" size="icon-sm" aria-label="Back to owner dashboard">
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                </Link>
+                <span>Back to dashboard</span>
             </div>
-        </div>
+
+            <section className="space-y-4">
+                <h2 className="text-lg font-semibold tracking-tight">
+                    Active tenants
+                </h2>
+                <TenantList assignments={assignments || []} />
+            </section>
+        </DashboardShell>
     )
 }

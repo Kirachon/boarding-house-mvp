@@ -41,7 +41,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
     }
 
     return (
-        <div className="rounded-md border bg-white shadow-sm">
+        <div className="rounded-md border border-border bg-card shadow-sm">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -56,7 +56,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                 <TableBody>
                     {invoices.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} className="text-center h-24 text-gray-500">
+                            <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                                 No invoices found. Generate one above.
                             </TableCell>
                         </TableRow>
@@ -67,7 +67,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                                     {invoice.profiles?.full_name || 'Unknown'}
                                 </TableCell>
                                 <TableCell>{invoice.description}</TableCell>
-                                <TableCell className="text-gray-500">
+                                <TableCell className="text-muted-foreground">
                                     {new Date(invoice.due_date).toLocaleDateString()}
                                 </TableCell>
                                 <TableCell className="font-mono font-semibold">
@@ -89,7 +89,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                                         </Button>
                                     )}
                                     {invoice.status === 'paid' && (
-                                        <span className="text-xs text-gray-400 italic mr-2">Received</span>
+                                        <span className="mr-2 text-xs italic text-muted-foreground">Received</span>
                                     )}
                                 </TableCell>
                             </TableRow>

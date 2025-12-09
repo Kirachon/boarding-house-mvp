@@ -53,22 +53,26 @@ export function GrievanceList({ initialGrievances, userId }: GrievanceListProps)
     }, [supabase, userId])
 
     if (grievances.length === 0) {
-        return <p className="text-sm text-blue-700">No active grievances found.</p>
+        return (
+            <p className="text-sm text-muted-foreground">
+                You haven&apos;t reported any issues yet. Use the form above whenever something needs attention.
+            </p>
+        )
     }
 
     return (
         <div className="space-y-4">
             {grievances.map((grievance) => (
-                <div key={grievance.id} className="p-4 bg-white rounded border border-gray-200 shadow-sm flex justify-between items-start">
+                <div key={grievance.id} className="flex items-start justify-between rounded border border-border bg-card p-4 shadow-sm">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold capitalize text-gray-900">{grievance.category}</span>
+                            <span className="font-semibold capitalize text-foreground">{grievance.category}</span>
                             <Badge variant={statusColorMap[grievance.status] || "outline"}>
                                 {grievance.status.replace('_', ' ')}
                             </Badge>
                         </div>
-                        <p className="text-sm text-gray-600 line-clamp-2">{grievance.description}</p>
-                        <p className="text-xs text-gray-400 mt-2">
+                        <p className="text-sm text-muted-foreground line-clamp-2">{grievance.description}</p>
+                        <p className="mt-2 text-xs text-muted-foreground">
                             Reported: {new Date(grievance.created_at).toLocaleDateString()}
                         </p>
                     </div>

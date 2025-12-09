@@ -32,16 +32,18 @@ export function TenantInvoiceList({ invoices }: TenantInvoiceListProps) {
             </CardHeader>
             <CardContent className="space-y-4">
                 {invoices.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">No bills yet.</p>
+                    <p className="py-4 text-center text-sm text-muted-foreground">
+                        No bills yet. When your landlord issues an invoice, it will appear here.
+                    </p>
                 ) : (
                     invoices.map(invoice => (
                         <div key={invoice.id} className="flex justify-between items-center border-b pb-3 last:border-0 last:pb-0">
                             <div>
-                                <p className="font-medium text-sm text-gray-800">{invoice.description}</p>
-                                <p className="text-xs text-gray-500">Due: {new Date(invoice.due_date).toLocaleDateString()}</p>
+                                <p className="text-sm font-medium text-foreground">{invoice.description}</p>
+                                <p className="text-xs text-muted-foreground">Due: {new Date(invoice.due_date).toLocaleDateString()}</p>
                             </div>
                             <div className="text-right">
-                                <p className="font-bold text-gray-900">${invoice.amount.toFixed(2)}</p>
+                                <p className="font-bold text-foreground">${invoice.amount.toFixed(2)}</p>
                                 {invoice.status === 'paid' ? (
                                     <span className="flex items-center text-xs text-green-600 gap-1 justify-end">
                                         <CheckCircle2 className="w-3 h-3" /> Paid

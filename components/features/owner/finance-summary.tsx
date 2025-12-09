@@ -36,16 +36,16 @@ export function FinanceSummary({ invoices }: FinanceSummaryProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Card className="border-l-4 border-l-green-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-600">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                         Income This Month
                     </CardTitle>
                     <TrendingUp className="h-4 w-4 text-green-500" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-gray-900">
+                    <div className="text-2xl font-bold text-foreground">
                         ${totalPaidThisMonth.toFixed(2)}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="mt-1 text-xs text-muted-foreground">
                         From {thisMonthInvoices.filter(i => i.status === 'paid').length} paid invoices
                     </p>
                 </CardContent>
@@ -53,16 +53,16 @@ export function FinanceSummary({ invoices }: FinanceSummaryProps) {
 
             <Card className="border-l-4 border-l-yellow-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-600">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                         Outstanding
                     </CardTitle>
                     <DollarSign className="h-4 w-4 text-yellow-500" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-gray-900">
+                    <div className="text-2xl font-bold text-foreground">
                         ${totalOutstanding.toFixed(2)}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="mt-1 text-xs text-muted-foreground">
                         Awaiting payment
                     </p>
                 </CardContent>
@@ -70,16 +70,16 @@ export function FinanceSummary({ invoices }: FinanceSummaryProps) {
 
             <Card className="border-l-4 border-l-red-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-600">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                         Overdue
                     </CardTitle>
                     <AlertCircle className="h-4 w-4 text-red-500" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-gray-900">
+                    <div className="text-2xl font-bold text-foreground">
                         ${totalOverdue.toFixed(2)}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="mt-1 text-xs text-muted-foreground">
                         Past due date
                     </p>
                 </CardContent>

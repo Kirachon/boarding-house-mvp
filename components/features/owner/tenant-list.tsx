@@ -36,7 +36,7 @@ export function TenantList({ assignments }: TenantListProps) {
     }
 
     return (
-        <div className="rounded-md border bg-white">
+        <div className="rounded-md border border-border bg-card">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -50,7 +50,7 @@ export function TenantList({ assignments }: TenantListProps) {
                 <TableBody>
                     {assignments.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center h-24 text-gray-500">
+                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                                 No active tenants found. Invite one above.
                             </TableCell>
                         </TableRow>
@@ -69,11 +69,11 @@ export function TenantList({ assignments }: TenantListProps) {
                                     {assignment.rooms?.name || 'Unassigned'}
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                    <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
                                         Active
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="text-gray-500 text-sm">
+                                <TableCell className="text-sm text-muted-foreground">
                                     {new Date(assignment.start_date).toLocaleDateString()}
                                 </TableCell>
                                 <TableCell className="text-right">

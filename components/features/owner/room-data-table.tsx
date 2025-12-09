@@ -36,7 +36,7 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
     }
 
     return (
-        <div className="rounded-md border bg-white">
+        <div className="rounded-md border border-border bg-card">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -50,7 +50,7 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
                 <TableBody>
                     {rooms.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center h-24 text-gray-500">
+                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                                 No rooms found. Create one above.
                             </TableCell>
                         </TableRow>

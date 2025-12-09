@@ -46,26 +46,26 @@ export default async function PublicVerificationPage({ params }: { params: Promi
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6 flex items-center justify-center">
-            <Card className="w-full max-w-lg shadow-xl border-t-8 border-t-blue-600">
-                <CardHeader className="text-center pb-2">
-                    <div className="mx-auto bg-blue-100 p-3 rounded-full w-fit mb-4">
+            <Card className="w-full max-w-lg border-t-8 border-t-blue-600 shadow-xl">
+                <CardHeader className="pb-2 text-center">
+                    <div className="mx-auto mb-4 w-fit rounded-full bg-blue-100 p-3">
                         <ShieldCheck className="w-10 h-10 text-blue-600" />
                     </div>
 
                     {property.is_verified ? (
-                        <Badge variant="default" className="mx-auto w-fit bg-blue-600 hover:bg-blue-700 mb-2">
+                        <Badge variant="default" className="mx-auto mb-2 w-fit bg-blue-600 hover:bg-blue-700">
                             Official Verified Partner
                         </Badge>
                     ) : (
-                        <Badge variant="outline" className="mx-auto w-fit mb-2">
+                        <Badge variant="outline" className="mx-auto mb-2 w-fit">
                             Registered Property
                         </Badge>
                     )}
 
-                    <CardTitle className="text-2xl font-bold text-gray-900 mt-2">
+                    <CardTitle className="mt-2 text-2xl font-bold text-foreground">
                         {property.name}
                     </CardTitle>
-                    <CardDescription className="flex items-center justify-center gap-1 mt-1 text-gray-600">
+                    <CardDescription className="mt-1 flex items-center justify-center gap-1 text-muted-foreground">
                         <MapPin className="w-4 h-4" />
                         {property.address}
                     </CardDescription>
@@ -73,15 +73,15 @@ export default async function PublicVerificationPage({ params }: { params: Promi
                 <CardContent className="space-y-6 pt-6">
 
                     {/* Availability Status */}
-                    <div className={`rounded-lg p-4 flex items-center gap-4 ${property.available_rooms > 0 ? 'bg-green-50 border border-green-200' : 'bg-gray-100 border border-gray-200'}`}>
-                        <div className={`p-2 rounded-full ${property.available_rooms > 0 ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
+                    <div className={`flex items-center gap-4 rounded-lg p-4 ${property.available_rooms > 0 ? 'bg-green-50 border border-green-200' : 'bg-muted border border-border'}`}>
+                        <div className={`rounded-full p-2 ${property.available_rooms > 0 ? 'bg-green-100 text-green-600' : 'bg-muted-foreground/10 text-muted-foreground'}`}>
                             <BedDouble className="w-6 h-6" />
                         </div>
                         <div>
-                            <h4 className={`font-semibold ${property.available_rooms > 0 ? 'text-green-900' : 'text-gray-700'}`}>
+                            <h4 className={`font-semibold ${property.available_rooms > 0 ? 'text-green-900' : 'text-foreground'}`}>
                                 {property.available_rooms > 0 ? 'Space Available' : 'Fully Booked'}
                             </h4>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-muted-foreground">
                                 {property.available_rooms > 0
                                     ? `${property.available_rooms} room${property.available_rooms > 1 ? 's' : ''} currently vacant.`
                                     : 'Check back later for openings.'}
@@ -90,30 +90,30 @@ export default async function PublicVerificationPage({ params }: { params: Promi
                     </div>
 
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">About</h3>
-                        <p className="text-gray-700 leading-relaxed">
+                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">About</h3>
+                        <p className="leading-relaxed text-foreground">
                             {property.description || "No description provided."}
                         </p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Amenities</h3>
+                    <div className="rounded-lg border border-border bg-muted/40 p-4">
+                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Amenities</h3>
                         {property.amenities && property.amenities.length > 0 ? (
                             <div className="grid grid-cols-2 gap-2">
                                 {property.amenities.map((amenity: string) => (
-                                    <div key={amenity} className="flex items-center gap-2 text-gray-700">
+                                    <div key={amenity} className="flex items-center gap-2 text-foreground">
                                         <CheckCircle2 className="w-4 h-4 text-green-500" />
                                         <span className="text-sm">{amenity}</span>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-sm text-gray-400 italic">No specific amenities listed.</p>
+                            <p className="text-sm italic text-muted-foreground">No specific amenities listed.</p>
                         )}
                     </div>
 
-                    <div className="text-center pt-4 border-t border-gray-100">
-                        <p className="text-xs text-gray-400">
+                    <div className="border-t border-border/40 pt-4 text-center">
+                        <p className="text-xs text-muted-foreground">
                             Official Verification Page • Powered by BoardingHouse Trust
                         </p>
                     </div>

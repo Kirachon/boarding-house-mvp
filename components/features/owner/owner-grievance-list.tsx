@@ -67,22 +67,26 @@ export function OwnerGrievanceList({ initialGrievances }: OwnerGrievanceListProp
     }
 
     if (grievances.length === 0) {
-        return <p className="text-gray-500">No active grievances.</p>
+        return (
+            <p className="text-sm text-muted-foreground">
+                No active grievances. You&apos;re all caught up.
+            </p>
+        )
     }
 
     return (
         <div className="space-y-4">
             {grievances.map((grievance) => (
-                <div key={grievance.id} className="p-4 bg-white rounded border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div key={grievance.id} className="flex flex-col items-start justify-between gap-4 rounded border border-border bg-card p-4 shadow-sm md:flex-row md:items-center">
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold capitalize text-gray-900">{grievance.category}</span>
+                            <span className="font-semibold capitalize text-foreground">{grievance.category}</span>
                             <Badge variant={statusColorMap[grievance.status] || "outline"}>
                                 {grievance.status.replace('_', ' ')}
                             </Badge>
                         </div>
-                        <p className="text-sm text-gray-600">{grievance.description}</p>
-                        <p className="text-xs text-gray-400 mt-2">
+                        <p className="text-sm text-muted-foreground">{grievance.description}</p>
+                        <p className="mt-2 text-xs text-muted-foreground">
                             Reported: {new Date(grievance.created_at).toLocaleDateString()}
                         </p>
                     </div>
