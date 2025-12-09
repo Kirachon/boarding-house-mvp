@@ -140,6 +140,7 @@ export type Database = {
                     status: Database["public"]["Enums"]["invoice_status"]
                     tenant_id: string
                     updated_at: string
+                    proof_image_url: string | null
                 }
                 Insert: {
                     amount: number
@@ -150,6 +151,7 @@ export type Database = {
                     status?: Database["public"]["Enums"]["invoice_status"]
                     tenant_id: string
                     updated_at?: string
+                    proof_image_url?: string | null
                 }
                 Update: {
                     amount?: number
@@ -160,6 +162,7 @@ export type Database = {
                     status?: Database["public"]["Enums"]["invoice_status"]
                     tenant_id?: string
                     updated_at?: string
+                    proof_image_url?: string | null
                 }
                 Relationships: []
             }
@@ -309,7 +312,7 @@ export type Database = {
         Enums: {
             grievance_category: "wifi" | "cleaning" | "maintenance" | "other"
             grievance_status: "open" | "in_progress" | "resolved" | "rejected"
-            invoice_status: "unpaid" | "paid" | "overdue" | "cancelled"
+            invoice_status: "unpaid" | "paid" | "overdue" | "cancelled" | "pending_verification"
             item_condition: "good" | "fair" | "poor" | "broken"
             room_occupancy: "vacant" | "occupied" | "maintenance"
             user_role: "owner" | "tenant" | "guest" | "admin"

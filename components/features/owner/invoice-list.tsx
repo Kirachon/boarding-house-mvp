@@ -11,10 +11,11 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Database } from '@/types/supabase'
-import { CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { CheckCircle2, Clock, XCircle, FileSearch } from 'lucide-react'
 import { updateInvoiceStatus } from '@/actions/invoice'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
+import { PaymentVerificationDialog } from './payment-verification-dialog'
 
 type Invoice = Database['public']['Tables']['invoices']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'] | null
@@ -44,6 +45,12 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                 return (
                     <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">
                         <Clock className="w-3 h-3 mr-1" /> Pending
+                    </Badge>
+                )
+            case 'pending_verification':
+                return (
+                    <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50 animate-pulse">
+                        <FileSearch className="w-3 h-3 mr-1" /> Review Needed
                     </Badge>
                 )
             case 'overdue':
@@ -103,21 +110,34 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                                         {getStatusBadge(invoice.status)}
                                     </TableCell>
                                     <TableCell className="text-right pr-6">
-                                        {invoice.status !== 'paid' && (
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-                                                onClick={() => handleStatusChange(invoice.id, 'paid')}
-                                            >
-                                                <CheckCircle2 className="w-4 h-4 mr-2" />
-                                                Mark Paid
-                                            </Button>
-                                        )}
-                                        {invoice.status === 'paid' && (
-                                            <span className="text-xs text-muted-foreground italic px-3 py-2">
-                                                Received {new Date().toLocaleDateString()}
-                                            </span>
+                                        {invoice.status === 'pending_verification' ? (
+                                            <PaymentVerificationDialog
+                                                invoice={invoice}
+                                                trigger={
+                                                    <Button size="sm" className="gradient-blue text-white shadow-lg shadow-blue-500/20">
+                                                        Review Proof
+                                                    </Button>
+                                                }
+                                            />
+                                        ) : (
+                                            <>
+                                                {invoice.status !== 'paid' && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                                                        onClick={() => handleStatusChange(invoice.id, 'paid')}
+                                                    >
+                                                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                                                        Mark Paid
+                                                    </Button>
+                                                )}
+                                                {invoice.status === 'paid' && (
+                                                    <span className="text-xs text-muted-foreground italic px-3 py-2">
+                                                        Received
+                                                    </span>
+                                                )}
+                                            </>
                                         )}
                                     </TableCell>
                                 </TableRow>
