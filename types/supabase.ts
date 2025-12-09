@@ -11,6 +11,60 @@ export type Database = {
     // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
     public: {
         Tables: {
+            announcements: {
+                Row: {
+                    id: string
+                    title: string
+                    content: string
+                    is_active: boolean
+                    created_at: string
+                    created_by: string | null
+                }
+                Insert: {
+                    id?: string
+                    title: string
+                    content: string
+                    is_active?: boolean
+                    created_at?: string
+                    created_by?: string | null
+                }
+                Update: {
+                    id?: string
+                    title?: string
+                    content?: string
+                    is_active?: boolean
+                    created_at?: string
+                    created_by?: string | null
+                }
+                Relationships: []
+            }
+            expenses: {
+                Row: {
+                    id: string
+                    category: string
+                    amount: number
+                    description: string | null
+                    expense_date: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    category: string
+                    amount: number
+                    description?: string | null
+                    expense_date?: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    category?: string
+                    amount?: number
+                    description?: string | null
+                    expense_date?: string
+                    created_at?: string
+                }
+                Relationships: []
+            }
             grievances: {
                 Row: {
                     category: Database["public"]["Enums"]["grievance_category"]
@@ -205,6 +259,8 @@ export type Database = {
                 Row: {
                     created_at: string
                     end_date: string | null
+                    lease_start: string | null
+                    lease_end: string | null
                     id: string
                     is_active: boolean
                     room_id: string
@@ -214,6 +270,8 @@ export type Database = {
                 Insert: {
                     created_at?: string
                     end_date?: string | null
+                    lease_start?: string | null
+                    lease_end?: string | null
                     id?: string
                     is_active?: boolean
                     room_id: string
@@ -223,6 +281,8 @@ export type Database = {
                 Update: {
                     created_at?: string
                     end_date?: string | null
+                    lease_start?: string | null
+                    lease_end?: string | null
                     id?: string
                     is_active?: boolean
                     room_id?: string

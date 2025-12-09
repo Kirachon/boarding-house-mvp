@@ -51,10 +51,10 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.488 0.243 264.376);
+  --primary: oklch(0.55 0.2 250);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.488 0.243 264.376);
+  --secondary-foreground: oklch(0.55 0.2 250);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.552 0.016 285.938);
   --accent: oklch(0.97 0 0);
@@ -118,6 +118,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

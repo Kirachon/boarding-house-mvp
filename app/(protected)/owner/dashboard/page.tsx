@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { AlertTriangle, Users } from 'lucide-react'
+import { AlertTriangle, Users, TrendingUp } from 'lucide-react'
 
 import { logout } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
@@ -8,12 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { OwnerGrievanceList } from '@/components/features/owner/owner-grievance-list'
 import { RoomHealthGrid } from '@/components/features/owner/room-health-grid'
 import { RoomAvailabilityPanel } from '@/components/features/owner/room-availability-panel'
-import { StayTimeline } from '@/components/features/owner/stay-timeline'
 import { DashboardShell } from '@/components/shared/dashboard-shell'
 import { MetricCard } from '@/components/shared/metric-card'
-import { FinanceSummary } from '@/components/features/owner/finance-summary'
-import { Plus, UserPlus, FileText } from 'lucide-react'
-import Link from 'next/link'
+import { FinanceOverview } from '@/components/features/owner/finance-overview'
+import { QuickActions } from '@/components/features/owner/quick-actions'
+import { AnnouncementWidget } from '@/components/features/owner/announcement-widget'
+import { LeaseExpiryAlert } from '@/components/features/owner/lease-expiry-alert'
 
 export default async function OwnerDashboardPage() {
     const supabase = await createClient()
@@ -21,50 +21,57 @@ export default async function OwnerDashboardPage() {
 
     if (!user) redirect('/login')
 
-    // Fetch all active grievances
+    // 1. Fetch Grievances
     const { data: grievances } = await supabase
         .from('grievances')
         .select('*')
-        .select('*')
         .order('created_at', { ascending: true })
 
-    // Fetch invoices for Finance Summary
+    // 2. Fetch Invoices for Finance
     const { data: invoices } = await supabase
         .from('invoices')
         .select('*')
         .order('due_date', { ascending: false })
 
-    // Fetch rooms with inventory (Deep Fetch)
+    // 3. Fetch Rooms
     const { data: rooms } = await supabase
         .from('rooms')
-        .select(`
-      *,
-      inventory_items (*)
-    `)
+        .select(`*, inventory_items (*)`)
         .order('name')
 
+    // 4. Fetch Active Assignments (for Leases)
+    const { data: assignmentData } = await supabase
+        .from('tenant_room_assignments')
+        .select(`
+            id, start_date, end_date, lease_end, is_active,
+            tenant:tenant_id(full_name),
+            room:room_id(name)
+        `)
+        .eq('is_active', true)
+        .order('lease_end', { ascending: true })
+
+    // 5. Fetch Announcements
+    const { data: announcements } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+    // Calculations
     const activeCount = grievances?.filter(g => g.status === 'open' || g.status === 'in_progress').length || 0
 
-    // Calculate Occupancy
+    // Finance Calculations
+    const allInvoices = invoices || []
+    const totalIncome = allInvoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + Number(i.amount), 0)
+    const outstanding = allInvoices.filter(i => i.status === 'pending').reduce((sum, i) => sum + Number(i.amount), 0)
+    const overdue = allInvoices.filter(i => i.status === 'overdue').reduce((sum, i) => sum + Number(i.amount), 0)
+
+    // Occupancy
     const totalRooms = rooms?.length || 0
     const occupiedRooms = rooms?.filter(r => r.occupancy === 'occupied').length || 0
     const occupancyRate = totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0
 
-    // Fetch active and recent tenant stays
-    const { data: assignmentData } = await supabase
-        .from('tenant_room_assignments')
-        .select(`
-        id,
-        start_date,
-        end_date,
-        is_active,
-        tenant:tenant_id(full_name),
-        room:room_id(name)
-    `)
-        .order('start_date', { ascending: false })
-        .limit(12)
-
-    // Transform data to match component expectations (handle potential array returns from joins)
+    // Transform assignments safely
     const assignments = (assignmentData || []).map((item: any) => ({
         ...item,
         tenant: Array.isArray(item.tenant) ? item.tenant[0] : item.tenant,
@@ -74,88 +81,72 @@ export default async function OwnerDashboardPage() {
     return (
         <DashboardShell
             title="Owner Command Center"
-            subtitle={`Welcome back, ${user.email}`}
+            subtitle="Overview of property performance and alerts."
             action={(
                 <form action={logout}>
-                    <Button variant="outline" size="sm">
-                        Sign Out
-                    </Button>
+                    <Button variant="outline" size="sm">Sign Out</Button>
                 </form>
             )}
         >
-            <div className="space-y-8">
-                {/* Quick Actions Row */}
-                <div className="flex flex-wrap gap-2">
-                    <Link href="/owner/tenants">
-                        <Button className="gap-2 shadow-sm">
-                            <UserPlus size={16} /> Add Tenant
-                        </Button>
-                    </Link>
-                    <Link href="/owner/finance">
-                        <Button variant="secondary" className="gap-2 shadow-sm">
-                            <FileText size={16} /> Create Invoice
-                        </Button>
-                    </Link>
-                    <Link href="/owner/rooms">
-                        <Button variant="outline" className="gap-2 shadow-sm">
-                            <Plus size={16} /> Add Room
-                        </Button>
-                    </Link>
+            <div className="space-y-6">
+                {/* Top Section: Quick Actions & Finance */}
+                <div className="flex flex-col gap-6">
+                    <QuickActions />
+                    <FinanceOverview
+                        totalIncome={totalIncome}
+                        outstanding={outstanding}
+                        overdue={overdue}
+                    />
                 </div>
 
-                {/* Financial Overview */}
-                <FinanceSummary invoices={invoices || []} />
+                {/* Main Grid Layout */}
+                <div className="grid gap-6 lg:grid-cols-3">
 
-                <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Property Overview</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <MetricCard
-                                    label="Active Issues"
-                                    value={activeCount}
-                                    helperText={activeCount > 0
-                                        ? "Prioritize open and in-progress grievances today."
-                                        : "You're all clear. No active issues right now."}
-                                    icon={<AlertTriangle />}
-                                />
-                                <MetricCard
-                                    label="Occupancy"
-                                    value={`${occupancyRate}%`}
-                                    helperText={`${occupiedRooms} of ${totalRooms} rooms occupied.`}
-                                    icon={<Users />}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
+                    {/* Left Column (2/3) */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Property Vitals */}
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <MetricCard
+                                label="Occupancy Rate"
+                                value={`${occupancyRate}%`}
+                                helperText={`${occupiedRooms}/${totalRooms} rooms occupied`}
+                                icon={<TrendingUp />}
+                            />
+                            <MetricCard
+                                label="Active Issues"
+                                value={activeCount}
+                                helperText={activeCount > 0 ? "Requires attention" : "All good"}
+                                icon={<AlertTriangle className={activeCount > 0 ? "text-amber-500" : "text-green-500"} />}
+                            />
+                        </div>
 
-                    <RoomAvailabilityPanel rooms={rooms || []} />
-                </div>
-
-                <div className="grid items-start gap-8 lg:grid-cols-3">
-                    <div className="space-y-4 lg:col-span-2">
                         <div className="space-y-3">
-                            <h2 className="text-lg font-semibold tracking-tight">
-                                Living Inventory
-                            </h2>
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-semibold tracking-tight">Room Status</h2>
+                            </div>
                             <RoomHealthGrid rooms={rooms || []} />
                         </div>
 
-                        <div className="space-y-3">
-                            <h2 className="text-lg font-semibold tracking-tight">
-                                Stays
-                            </h2>
-                            <StayTimeline assignments={assignments} />
+                        <div className="hidden lg:block">
+                            {/* Hide Availability Panel on mobile/default if redundant, or keep it */}
+                            <RoomAvailabilityPanel rooms={rooms || []} />
                         </div>
                     </div>
 
-                    <div className="space-y-3 lg:col-span-1">
-                        <h2 className="text-lg font-semibold tracking-tight">
-                            Grievance Inbox
-                        </h2>
-                        <OwnerGrievanceList initialGrievances={grievances || []} />
+                    {/* Right Column (1/3) - Sidebar Widgets */}
+                    <div className="space-y-6">
+                        <LeaseExpiryAlert assignments={assignments} />
+
+                        <div className="h-[300px]">
+                            <AnnouncementWidget announcements={announcements || []} />
+                        </div>
+
+                        <div className="space-y-3">
+                            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                                Support Inbox
+                            </h2>
+                            <OwnerGrievanceList initialGrievances={grievances || []} />
+                        </div>
                     </div>
                 </div>
             </div>
