@@ -114,6 +114,39 @@ export default async function TenantDashboardPage() {
                                 <TenantInvoiceList invoices={invoices} />
                             </div>
                         </TenantCollapsibleSection>
+
+                        {/* Room Info */}
+                        <TenantCollapsibleSection title="My Room" defaultOpen={false}>
+                            <TenantRoomInventory
+                                roomName={roomName}
+                                occupancy={activeAssignment?.room?.occupancy}
+                                items={inventoryItems}
+                            />
+                            {activeAssignment && (
+                                <form
+                                    action={async () => {
+                                        'use server'
+                                        await completeHandoverChecklist('move_in')
+                                    }}
+                                    className="mt-3"
+                                >
+                                    <Button type="submit" variant="outline" size="sm" className="w-full text-xs h-8">
+                                        Confirm Move-In
+                                    </Button>
+                                </form>
+                            )}
+                        </TenantCollapsibleSection>
+
+                        {/* Documents */}
+                        <TenantCollapsibleSection id="lease-section" title="Docs" defaultOpen={false}>
+                            <TenantLeaseDocuments initialDocuments={leaseDocuments} />
+                        </TenantCollapsibleSection>
+
+                        {/* House Rules */}
+                        <div className="rounded-2xl bg-card/20 backdrop-blur-lg border border-white/5 p-4">
+                            <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">House rules</h3>
+                            <TenantHouseRules />
+                        </div>
                     </div>
 
                     {/* Middle Column: Issues & Maintenance (2 cols wide on large screens) */}
@@ -172,39 +205,6 @@ export default async function TenantDashboardPage() {
                                     workOrders={workOrders as any}
                                 />
                             </div>
-                        </div>
-
-                        {/* Room Info */}
-                        <TenantCollapsibleSection title="My Room" defaultOpen={false}>
-                            <TenantRoomInventory
-                                roomName={roomName}
-                                occupancy={activeAssignment?.room?.occupancy}
-                                items={inventoryItems}
-                            />
-                            {activeAssignment && (
-                                <form
-                                    action={async () => {
-                                        'use server'
-                                        await completeHandoverChecklist('move_in')
-                                    }}
-                                    className="mt-3"
-                                >
-                                    <Button type="submit" variant="outline" size="sm" className="w-full text-xs h-8">
-                                        Confirm Move-In
-                                    </Button>
-                                </form>
-                            )}
-                        </TenantCollapsibleSection>
-
-                        {/* Documents */}
-                        <TenantCollapsibleSection id="lease-section" title="Docs" defaultOpen={false}>
-                            <TenantLeaseDocuments initialDocuments={leaseDocuments} />
-                        </TenantCollapsibleSection>
-
-                        {/* House Rules */}
-                        <div className="rounded-2xl bg-card/20 backdrop-blur-lg border border-white/5 p-4">
-                            <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">House rules</h3>
-                            <TenantHouseRules />
                         </div>
                     </div>
                 </div>
