@@ -88,7 +88,7 @@ export default async function TenantDashboardPage() {
                 />
 
                 {/* 2. Bento Grid Layout */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-6">
 
                     {/* Left Column: Quick Actions & Status (2 cols wide) */}
                     <div className="md:col-span-2 space-y-6">
@@ -153,7 +153,7 @@ export default async function TenantDashboardPage() {
                     </div>
 
                     {/* Right Column: Info & Activity (Wider for readability) */}
-                    <div className="md:col-span-2 lg:col-span-2 xl:col-span-1 space-y-6">
+                    <div className="md:col-span-2 lg:col-span-2 xl:col-span-2 space-y-6">
 
                         {/* Announcements */}
                         <div className="rounded-2xl bg-card/20 backdrop-blur-lg border border-white/5 p-4">
@@ -202,7 +202,8 @@ export default async function TenantDashboardPage() {
                         </TenantCollapsibleSection>
 
                         {/* House Rules */}
-                        <div className="pt-2">
+                        <div className="rounded-2xl bg-card/20 backdrop-blur-lg border border-white/5 p-4">
+                            <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">House rules</h3>
                             <TenantHouseRules />
                         </div>
                     </div>

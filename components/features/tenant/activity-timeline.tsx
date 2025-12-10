@@ -112,19 +112,22 @@ export function TenantActivityTimeline({
             No recent activity yet.
           </p>
         ) : (
-          <div className="space-y-3 text-sm">
+          <div className="space-y-4 text-sm">
             {items.map((item) => (
-              <div key={item.id} className="flex gap-3 items-start">
-                <div className="mt-1 p-1.5 rounded-full bg-muted">
+              <div
+                key={item.id}
+                className="grid grid-cols-[auto,1fr,auto] items-start gap-3 rounded-lg border border-border/50 bg-background/60 p-3"
+              >
+                <div className="p-2 rounded-full bg-muted shrink-0 flex items-center justify-center">
                   {getIcon(item.type, item.status)}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm">{item.title}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <p className="font-medium text-sm leading-tight">{item.title}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed break-words">
                     {item.description}
                   </p>
                 </div>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                <span className="text-[11px] text-muted-foreground whitespace-nowrap text-right leading-tight pt-0.5">
                   {getTimeAgo(item.date)}
                 </span>
               </div>
@@ -135,4 +138,3 @@ export function TenantActivityTimeline({
     </Card>
   )
 }
-
