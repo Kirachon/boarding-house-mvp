@@ -39,7 +39,7 @@ export async function completeHandoverChecklist(type: 'move_in' | 'move_out') {
       },
       {
         onConflict: 'tenant_id, room_id, type',
-      } as any
+      }
     )
 
   if (error) {
@@ -49,4 +49,3 @@ export async function completeHandoverChecklist(type: 'move_in' | 'move_out') {
   revalidatePath('/tenant/dashboard')
   return { success: true }
 }
-

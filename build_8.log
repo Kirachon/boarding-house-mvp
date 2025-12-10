@@ -1,0 +1,24 @@
+
+> temp_app@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 9.3s
+   Running TypeScript ...
+Failed to compile.
+
+./components/features/owner/property-dialog.tsx:97:39
+Type error: Property 'city' does not exist on type '{ address: string; amenities: string[] | null; created_at: string; description: string | null; id: string; is_verified: boolean; name: string; owner_id: string; }'.
+
+   95 |               id="city"
+   96 |               name="city"
+>  97 |               defaultValue={property?.city ?? ''}
+      |                                       ^
+   98 |               placeholder="City / locality"
+   99 |               required
+  100 |             />
+Next.js build worker exited with code: 1 and signal: null

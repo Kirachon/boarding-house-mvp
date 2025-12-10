@@ -37,21 +37,26 @@ export function GrievanceForm() {
 
     function onSubmit(values: GrievanceFormValues) {
         startTransition(async () => {
-            const formData = new FormData()
-            formData.append('category', values.category)
-            formData.append('description', values.description)
+            try {
+                const formData = new FormData()
+                formData.append('category', values.category)
+                formData.append('description', values.description)
 
-            const result = await createGrievance(formData)
+                const result = await createGrievance(formData)
 
-            if (result?.error) {
-                // Show field-specific errors if available
-                const fieldErr = result.details?.fieldErrors
-                const descErr = fieldErr?.description?.[0]
-                const catErr = fieldErr?.category?.[0]
-                toast.error(descErr || catErr || result.error)
-            } else {
-                toast.success("Grievance submitted successfully")
-                form.reset({ category: 'maintenance', description: '' })
+                if (result?.error) {
+                    // Show field-specific errors if available
+                    const fieldErr = result.details?.fieldErrors
+                    const descErr = fieldErr?.description?.[0]
+                    const catErr = fieldErr?.category?.[0]
+                    toast.error(descErr || catErr || result.error)
+                } else {
+                    toast.success("Grievance submitted successfully")
+                    form.reset({ category: 'maintenance', description: '' })
+                }
+            } catch (error) {
+                console.error("Submission error:", error);
+                toast.error("An unexpected error occurred. Please try again.")
             }
         })
     }

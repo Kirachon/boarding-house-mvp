@@ -8,9 +8,6 @@ export function getDashboardPath(role: UserRole | string | null | undefined): st
             return '/owner/dashboard'
         case 'tenant':
             return '/tenant/dashboard'
-        case 'admin':
-            return '/admin/dashboard'
-        case 'guest':
         default:
             return '/' // Or a specific guest landing page
     }

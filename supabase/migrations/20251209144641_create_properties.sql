@@ -41,10 +41,10 @@ WITH CHECK (
 -- Better yet: If we are just viewing by ID in the public page, the owner_id doesn't strictly matter for the *view* unless we filter.
 -- Let's just create one.
 
-INSERT INTO public.properties (id, owner_id, name, address, description, amenities)
-VALUES 
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '00000000-0000-0000-0000-000000000000', 'Sunset Hive Boarding House', '123 Mango Avenue, Cebu City', 'A cozy and secure home for students and professionals. Walking distance to IT Park.', ARRAY['Fast Wifi', 'CCTV', 'Weekly Cleaning', 'Aircon'])
-ON CONFLICT DO NOTHING;
+-- INSERT INTO public.properties (id, owner_id, name, address, description, amenities)
+-- VALUES 
+--   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '00000000-0000-0000-0000-000000000000', 'Sunset Hive Boarding House', '123 Mango Avenue, Cebu City', 'A cozy and secure home for students and professionals. Walking distance to IT Park.', ARRAY['Fast Wifi', 'CCTV', 'Weekly Cleaning', 'Aircon'])
+-- ON CONFLICT DO NOTHING;
 
 -- Link our seed rooms to this property (Assuming rooms exist from previous step, we update them)
-UPDATE public.rooms SET property_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' WHERE property_id IS NULL;
+-- UPDATE public.rooms SET property_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' WHERE property_id IS NULL;

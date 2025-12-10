@@ -224,6 +224,7 @@ export type Database = {
                 Row: {
                     address: string
                     amenities: string[] | null
+                    city: string | null
                     created_at: string
                     description: string | null
                     id: string
@@ -387,8 +388,8 @@ export type Database = {
                         foreignKeyName: "tenant_room_assignments_room_id_fkey"
                         columns: ["room_id"]
                         isOneToOne: false
-                    referencedRelation: "rooms"
-                    referencedColumns: ["id"]
+                        referencedRelation: "rooms"
+                        referencedColumns: ["id"]
                     },
                 ]
             }

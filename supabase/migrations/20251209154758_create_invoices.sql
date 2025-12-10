@@ -12,7 +12,7 @@ CREATE TABLE public.invoices (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
 
     CONSTRAINT invoices_pkey PRIMARY KEY (id),
-    CONSTRAINT invoices_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.users(id)
+    CONSTRAINT invoices_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES auth.users(id)
 );
 
 -- RLS

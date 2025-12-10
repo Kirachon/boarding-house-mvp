@@ -19,12 +19,13 @@ export async function createGrievance(formData: FormData) {
     const rawData = {
         category: formData.get('category'),
         description: formData.get('description'),
-        photo_url: formData.get('photo_url'),
+        photo_url: formData.get('photo_url') || undefined,
     }
 
     const validated = GrievanceSchema.safeParse(rawData)
 
     if (!validated.success) {
+        console.error("createGrievance: validation failed", validated.error);
         return { error: 'Invalid input data', details: validated.error.flatten() }
     }
 
@@ -34,20 +35,23 @@ export async function createGrievance(formData: FormData) {
     } = await supabase.auth.getUser()
 
     if (!user) {
+        console.error("createGrievance: No user");
         return { error: 'Unauthorized' }
     }
 
     // Insert grievance
-    const { error } = await supabase
+    const { error, data } = await supabase
         .from('grievances')
         .insert({
             tenant_id: user.id,
             category: validated.data.category,
             description: validated.data.description,
-            photo_url: validated.data.photo_url || null,
+            photo_url: (validated.data.photo_url as string || null),
         })
+        .select()
 
     if (error) {
+        console.error("createGrievance: insert error", error);
         return { error: error.message }
     }
 

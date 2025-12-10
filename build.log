@@ -1,0 +1,35 @@
+
+> temp_app@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./components/features/owner/property-dialog.tsx:17:1
+Module not found: Can't resolve '@/components/ui/checkbox'
+  15 | import { Label } from '@/components/ui/label'
+  16 | import { Textarea } from '@/components/ui/textarea'
+> 17 | import { Checkbox } from '@/components/ui/checkbox'
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  18 | import { toast } from 'sonner'
+  19 | import { createProperty, updateProperty } from '@/actions/property'
+  20 | import { Database } from '@/types/supabase'
+
+Import map: aliased to relative './components/ui/checkbox' inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./components/features/owner/property-dialog.tsx
+    ./app/(protected)/owner/properties/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./components/features/owner/property-dialog.tsx:17:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

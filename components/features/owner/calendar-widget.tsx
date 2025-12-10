@@ -17,7 +17,7 @@ interface CalendarEvent {
 
 interface CalendarWidgetProps {
     invoices: Invoice[]
-    assignments: (Assignment & { rooms?: { name: string } | null })[]
+    assignments: (Assignment & { rooms?: { name: string | null } | null })[]
 }
 
 export function CalendarWidget({ invoices, assignments }: CalendarWidgetProps) {
@@ -105,7 +105,7 @@ export function CalendarWidget({ invoices, assignments }: CalendarWidgetProps) {
                                 </div>
                                 <div className="text-right">
                                     <span className={`text-xs font-medium ${event.daysUntil <= 3 ? 'text-red-600' :
-                                            event.daysUntil <= 7 ? 'text-amber-600' : 'text-blue-600'
+                                        event.daysUntil <= 7 ? 'text-amber-600' : 'text-blue-600'
                                         }`}>
                                         {event.daysUntil === 0 ? 'Today' :
                                             event.daysUntil === 1 ? 'Tomorrow' :

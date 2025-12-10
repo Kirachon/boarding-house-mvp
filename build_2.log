@@ -1,0 +1,32 @@
+
+> temp_app@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 12.1s
+   Running TypeScript ...
+Failed to compile.
+
+./app/(protected)/owner/dashboard/page.tsx:186:29
+Type error: Type 'AssignmentRow[]' is not assignable to type '({ created_at: string; end_date: string | null; lease_start: string | null; lease_end: string | null; id: string; is_active: boolean; room_id: string; start_date: string; tenant_id: string; } & { ...; })[]'.
+  Type 'AssignmentRow' is not assignable to type '{ created_at: string; end_date: string | null; lease_start: string | null; lease_end: string | null; id: string; is_active: boolean; room_id: string; start_date: string; tenant_id: string; } & { ...; }'.
+    Type 'AssignmentRow' is not assignable to type '{ rooms?: { name: string; } | null | undefined; }'.
+      Types of property 'rooms' are incompatible.
+        Type '{ name: string | null; } | null | undefined' is not assignable to type '{ name: string; } | null | undefined'.
+          Type '{ name: string | null; }' is not assignable to type '{ name: string; }'.
+            Types of property 'name' are incompatible.
+              Type 'string | null' is not assignable to type 'string'.
+                Type 'null' is not assignable to type 'string'.
+
+  184 |                         <CalendarWidget
+  185 |                             invoices={invoices || []}
+> 186 |                             assignments={assignments}
+      |                             ^
+  187 |                         />
+  188 |
+  189 |                         {/* NEW: Activity Timeline */}
+Next.js build worker exited with code: 1 and signal: null

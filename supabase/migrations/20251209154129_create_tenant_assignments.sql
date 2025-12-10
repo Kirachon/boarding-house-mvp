@@ -9,7 +9,7 @@ CREATE TABLE public.tenant_room_assignments (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
 
     CONSTRAINT tenant_room_assignments_pkey PRIMARY KEY (id),
-    CONSTRAINT tenant_room_assignments_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.users(id),
+    CONSTRAINT tenant_room_assignments_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES auth.users(id),
     CONSTRAINT tenant_room_assignments_room_id_fkey FOREIGN KEY (room_id) REFERENCES public.rooms(id)
 );
 

@@ -1,10 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { AlertTriangle, Users, TrendingUp, Wrench } from 'lucide-react'
+import { AlertTriangle, TrendingUp, Wrench } from 'lucide-react'
 
 import { logout } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { OwnerGrievanceList } from '@/components/features/owner/owner-grievance-list'
 import { RoomHealthGrid } from '@/components/features/owner/room-health-grid'
 import { RoomAvailabilityPanel } from '@/components/features/owner/room-availability-panel'
@@ -17,6 +16,7 @@ import { LeaseExpiryAlert } from '@/components/features/owner/lease-expiry-alert
 import { ActivityTimeline } from '@/components/features/owner/activity-timeline'
 import { CalendarWidget } from '@/components/features/owner/calendar-widget'
 import { OccupancySparkline } from '@/components/features/owner/occupancy-sparkline'
+import { Database } from '@/types/supabase'
 
 export default async function OwnerDashboardPage() {
     const supabase = await createClient()
@@ -71,9 +71,19 @@ export default async function OwnerDashboardPage() {
 
     // Finance Calculations
     const allInvoices = invoices || []
-    const totalIncome = allInvoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + Number(i.amount), 0)
-    const outstanding = allInvoices.filter(i => i.status === 'pending' || i.status === 'unpaid').reduce((sum, i) => sum + Number(i.amount), 0)
-    const overdue = allInvoices.filter(i => i.status === 'overdue').reduce((sum, i) => sum + Number(i.amount), 0)
+    const totalIncome = allInvoices
+        .filter((i) => i.status === 'paid')
+        .reduce((sum, i) => sum + Number(i.amount), 0)
+
+    const outstanding = allInvoices
+        .filter((i) => i.status === 'unpaid' || i.status === 'pending_verification')
+        .reduce((sum, i) => sum + Number(i.amount), 0)
+
+    const overdue = allInvoices
+        .filter((i) => i.status === 'overdue')
+        .reduce((sum, i) => sum + Number(i.amount), 0)
+
+    const pendingCount = allInvoices.filter((i) => i.status === 'pending_verification').length
 
     // Occupancy
     const totalRooms = rooms?.length || 0
@@ -85,12 +95,24 @@ export default async function OwnerDashboardPage() {
     ).length
 
     // Transform assignments safely
-    const assignments = (assignmentData || []).map((item: any) => ({
-        ...item,
-        tenant: Array.isArray(item.tenant) ? item.tenant[0] : item.tenant,
-        room: Array.isArray(item.room) ? item.room[0] : item.room,
-        rooms: Array.isArray(item.room) ? item.room[0] : item.room, // for CalendarWidget compatibility
-    }))
+    type AssignmentRow = Database['public']['Tables']['tenant_room_assignments']['Row'] & {
+        tenant?: { full_name: string | null } | { full_name: string | null }[] | null
+        room?: { name: string | null } | { name: string | null }[] | null
+        rooms?: { name: string | null } | null
+    }
+
+    const assignments: AssignmentRow[] = (assignmentData || []).map((item) => {
+        const raw = item as AssignmentRow
+        const tenant = Array.isArray(raw.tenant) ? raw.tenant[0] : raw.tenant
+        const room = Array.isArray(raw.room) ? raw.room[0] : raw.room
+
+        return {
+            ...raw,
+            tenant,
+            room,
+            rooms: room ?? null,
+        }
+    })
 
     return (
         <DashboardShell
@@ -110,6 +132,7 @@ export default async function OwnerDashboardPage() {
                         totalIncome={totalIncome}
                         outstanding={outstanding}
                         overdue={overdue}
+                        pendingCount={pendingCount}
                     />
                 </div>
 

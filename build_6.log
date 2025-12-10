@@ -1,0 +1,26 @@
+
+> temp_app@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 8.3s
+   Running TypeScript ...
+Failed to compile.
+
+./app/(protected)/tenant/issues/page.tsx:53:40
+Type error: Conversion of type 'GenericStringError[]' to type 'WorkOrder[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'GenericStringError' is not comparable to type 'WorkOrder'.
+    Type '{ error: true; } & String' is missing the following properties from type '{ id: string; grievance_id: string | null; room_id: string | null; tenant_id: string | null; vendor_id: string | null; title: string; description: string | null; priority: "low" | "medium" | "high"; ... 8 more ...; updated_at: string; }': id, grievance_id, room_id, tenant_id, and 13 more.
+
+  51 |   > = {}
+  52 |
+> 53 |   const typedWorkOrders: WorkOrder[] = (workOrders || []) as WorkOrder[]
+     |                                        ^
+  54 |
+  55 |   typedWorkOrders.forEach((w) => {
+  56 |     if (w.grievance_id) {
+Next.js build worker exited with code: 1 and signal: null

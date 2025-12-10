@@ -1,0 +1,26 @@
+
+> temp_app@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 5.2s
+   Running TypeScript ...
+Failed to compile.
+
+./app/(protected)/owner/documents/page.tsx:61:30
+Type error: Type 'GenericStringError[]' is not assignable to type 'Document[]'.
+  Type 'GenericStringError' is not assignable to type 'Document'.
+    Type '{ error: true; } & String' is missing the following properties from type '{ id: string; tenant_id: string | null; title: string; type: string; file_url: string; created_at: string; }': id, tenant_id, title, type, and 2 more.
+
+  59 |       <section className="space-y-4">
+  60 |         <h2 className="text-lg font-semibold tracking-tight">Lease documents</h2>
+> 61 |         <LeaseDocumentsTable documents={documents || []} />
+     |                              ^
+  62 |       </section>
+  63 |     </DashboardShell>
+  64 |   )
+Next.js build worker exited with code: 1 and signal: null
