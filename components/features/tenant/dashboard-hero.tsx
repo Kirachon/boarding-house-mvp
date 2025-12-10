@@ -50,7 +50,7 @@ export function TenantDashboardHero({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Bill Status */}
                 <Card className="bg-background/60 backdrop-blur-md border-border/50 hover:shadow-md transition-all duration-300 group">
                     <CardContent className="p-4 flex items-center gap-4">

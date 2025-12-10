@@ -88,7 +88,7 @@ export default async function TenantDashboardPage() {
                 />
 
                 {/* 2. Bento Grid Layout */}
-                <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
 
                     {/* Left Column: Quick Actions & Status (2 cols wide) */}
                     <div className="md:col-span-2 space-y-6">

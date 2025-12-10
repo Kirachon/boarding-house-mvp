@@ -18,7 +18,7 @@ export function DashboardSidebar({ items }: DashboardSidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex md:w-60 lg:w-64 flex-col border-r bg-background/60 backdrop-blur">
+    <aside className="hidden md:flex md:w-60 lg:w-64 flex-col border-r bg-background/60 backdrop-blur sticky top-0 h-screen">
       <nav className="flex-1 px-3 py-4 space-y-1">
         {items.map((item) => {
           const isActive =
