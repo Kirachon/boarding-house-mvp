@@ -33,7 +33,7 @@ export function TenantAnnouncementList({ announcements }: TenantAnnouncementList
         ) : (
           announcements.map((a) => (
             <div key={a.id} className="text-sm space-y-1 border-b last:border-b-0 pb-3 last:pb-0">
-              <p className="font-medium truncate">{a.title}</p>
+              <p className="font-medium text-sm">{a.title}</p>
               <p className="text-xs text-muted-foreground whitespace-pre-line">
                 {a.content}
               </p>

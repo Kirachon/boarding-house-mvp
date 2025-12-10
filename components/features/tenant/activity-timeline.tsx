@@ -119,8 +119,8 @@ export function TenantActivityTimeline({
                   {getIcon(item.type, item.status)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{item.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">
+                  <p className="font-medium text-sm">{item.title}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
                     {item.description}
                   </p>
                 </div>

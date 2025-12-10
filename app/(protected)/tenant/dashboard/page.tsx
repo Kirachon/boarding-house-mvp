@@ -116,8 +116,8 @@ export default async function TenantDashboardPage() {
                         </TenantCollapsibleSection>
                     </div>
 
-                    {/* Middle Column: Issues & Maintenance (2-3 cols wide on large screens) */}
-                    <div className="md:col-span-2 lg:col-span-3 space-y-6">
+                    {/* Middle Column: Issues & Maintenance (2 cols wide on large screens) */}
+                    <div className="md:col-span-2 lg:col-span-2 xl:col-span-3 space-y-6">
                         {/* Report Issue Widget */}
                         <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-card/50 to-background/50 backdrop-blur-md overflow-hidden relative group">
                             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -152,8 +152,8 @@ export default async function TenantDashboardPage() {
                         </TenantCollapsibleSection>
                     </div>
 
-                    {/* Right Column: Info & Activity (Narrow column) */}
-                    <div className="md:col-span-2 lg:col-span-1 space-y-6">
+                    {/* Right Column: Info & Activity (Wider for readability) */}
+                    <div className="md:col-span-2 lg:col-span-2 xl:col-span-1 space-y-6">
 
                         {/* Announcements */}
                         <div className="rounded-2xl bg-card/20 backdrop-blur-lg border border-white/5 p-4">
