@@ -1,580 +1,213 @@
-import { createClient } from '@/lib/supabase/server'
-
 import { redirect } from 'next/navigation'
-
-
-
 import { logout } from '@/actions/auth'
-
 import { Button } from '@/components/ui/button'
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-
 import { GrievanceForm } from '@/components/features/tenant/grievance-form'
-
 import { GrievanceList } from '@/components/features/tenant/grievance-list'
-
 import { TenantInvoiceList } from '@/components/features/tenant/tenant-invoice-list'
-
 import { DashboardShell } from '@/components/shared/dashboard-shell'
-
 import { WorkOrderList } from '@/components/features/tenant/work-order-list'
-
 import { TenantAnnouncementList } from '@/components/features/tenant/announcement-list'
-
 import { TenantRoomInventory } from '@/components/features/tenant/room-inventory'
-
 import { TenantActivityTimeline } from '@/components/features/tenant/activity-timeline'
-
 import { TenantLeaseDocuments } from '@/components/features/tenant/lease-documents'
-
 import { TenantQuickActions } from '@/components/features/tenant/quick-actions'
-
 import { TenantCollapsibleSection } from '@/components/features/tenant/collapsible-section'
-
 import { TenantHouseRules } from '@/components/features/tenant/house-rules'
-
 import { Database } from '@/types/supabase'
-
 import { completeHandoverChecklist } from '@/actions/tenant-checklist'
-
-
+import { TenantDashboardHero } from '@/components/features/tenant/dashboard-hero'
+import {
+    getTenantDashboardData,
+    getTenantGrievances,
+    getTenantInvoices,
+    getTenantWorkOrders,
+    getActiveAnnouncements,
+    getTenantLeaseDocuments
+} from '@/lib/data/tenant'
 
 export default async function TenantDashboardPage() {
+    const dashboardData = await getTenantDashboardData()
 
-    const supabase = await createClient()
+    if (!dashboardData) redirect('/login')
 
-    const { data: { user } } = await supabase.auth.getUser()
+    const { user, activeAssignment, roomName, leaseEnd, inventoryItems } = dashboardData
 
+    const [grievances, invoices, announcements, workOrders, leaseDocuments] = await Promise.all([
+        getTenantGrievances(user.id),
+        getTenantInvoices(user.id),
+        getActiveAnnouncements(),
+        getTenantWorkOrders(user.id),
+        getTenantLeaseDocuments(user.id)
+    ])
 
-
-    if (!user) redirect('/login')
-
-
-
-    // Fetch current room assignment (if any)
-
-    const { data: activeAssignments } = await supabase
-
-        .from('tenant_room_assignments')
-
-        .select(`
-
-        id,
-
-        start_date,
-
-        end_date,
-
-        lease_start,
-
-        lease_end,
-
-        is_active,
-
-        room_id,
-
-        room:room_id(name, occupancy)
-
-    `)
-
-        .eq('tenant_id', user.id)
-
-        .eq('is_active', true)
-
-        .order('start_date', { ascending: false })
-
-        .limit(1)
-
-
-
-    const activeAssignment = activeAssignments?.[0] as any
-
-    const roomName = Array.isArray(activeAssignment?.room)
-
-        ? activeAssignment.room[0]?.name
-
-        : activeAssignment?.room?.name
-
-    const leaseStart = activeAssignment?.lease_start || activeAssignment?.start_date
-
-    const leaseEnd = activeAssignment?.lease_end || activeAssignment?.end_date
-
-
-
-    const roomId = activeAssignments?.[0]?.room_id as string | undefined
-
-
-
-    // Fetch initial grievances
-
-    const { data: grievances } = await supabase
-
-        .from('grievances')
-
-        .select('*')
-
-        .eq('tenant_id', user.id)
-
-        .order('created_at', { ascending: false })
-
-
-
-    // Fetch invoices
-
-    const { data: invoices } = await supabase
-
-        .from('invoices')
-
-        .select('*')
-
-        .eq('tenant_id', user.id)
-
-        .order('created_at', { ascending: false })
-
-
-
-    const { data: announcements } = await supabase
-
-        .from('announcements')
-
-        .select('*')
-
-        .eq('is_active', true)
-
-        .order('created_at', { ascending: false })
-
-        .limit(5)
-
-
-
-    const { data: inventoryItems } = roomId
-
-        ? await supabase
-
-            .from('inventory_items')
-
-            .select('*')
-
-            .eq('room_id', roomId)
-
-            .order('name')
-
-        : { data: null as any }
-
-
-
-    const { data: leaseDocuments } = await supabase
-
-        .from('documents')
-
-        .select('*')
-
-        .eq('tenant_id', user.id)
-
-        .eq('type', 'lease')
-
-        .order('created_at', { ascending: false })
-
-
-
-    const { data: workOrders } = await supabase
-
-        .from('work_orders')
-
-        .select(`
-
-        *,
-
-        room:rooms (
-
-            id,
-
-            name
-
-        )
-
-    `)
-
-        .eq('tenant_id', user.id)
-
-        .order('created_at', { ascending: false })
-
-
-
-    const unresolvedGrievances = (grievances || []).filter(
-
+    const unresolvedGrievances = grievances.filter(
         (g) => g.status === 'open' || g.status === 'in_progress'
-
     ).length
 
-
-
-    const openWorkOrders = (workOrders || []).filter(
-
+    const openWorkOrders = workOrders.filter(
         (w) => w.status === 'open' || w.status === 'in_progress' || w.status === 'waiting_vendor'
-
     ).length
 
-
-
-    const pendingVerificationCount = (invoices || []).filter(
-
+    const pendingVerificationCount = invoices.filter(
         (i) => i.status === 'pending_verification'
-
     ).length
-
-
-
-    const latestAnnouncement = (announcements || [])[0]
-
-
-
-    const resolvedGrievances = (grievances || []).filter((g) => g.status === 'resolved')
-
-    let averageResolutionDays: number | null = null
-
-    if (resolvedGrievances.length > 0) {
-
-        const totalDays = resolvedGrievances.reduce((sum, g) => {
-
-            const created = new Date(g.created_at).getTime()
-
-            const updated = new Date(g.updated_at).getTime()
-
-            const diffDays = Math.max(0, (updated - created) / (1000 * 60 * 60 * 24))
-
-            return sum + diffDays
-
-        }, 0)
-
-        averageResolutionDays = totalDays / resolvedGrievances.length
-
-    }
-
-
 
     const workOrderStatusesByGrievance: Record<string, Database['public']['Enums']['work_order_status']> = {}
-
-        ; (workOrders || []).forEach((w: any) => {
-
-            if (w.grievance_id) {
-
-                workOrderStatusesByGrievance[w.grievance_id] = w.status
-
-            }
-
-        })
-
-
+    workOrders.forEach((w: any) => {
+        if (w.grievance_id) {
+            workOrderStatusesByGrievance[w.grievance_id] = w.status
+        }
+    })
 
     const nextDueInvoice = invoices
-
-        ?.filter((invoice) => invoice.status === 'unpaid' || invoice.status === 'overdue')
-
+        .filter((invoice) => invoice.status === 'unpaid' || invoice.status === 'overdue')
         .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())[0]
 
-
-
     return (
-
         <DashboardShell
-
-            title="My Home"
-
+            title="Command Center"
             subtitle="Manage your stay"
-
-            maxWidthClassName="max-w-3xl"
-
+            maxWidthClassName="max-w-[1600px]" // Wider container for Bento Grid
             action={(
-
                 <form action={logout}>
-
-                    <Button variant="ghost" size="sm">
-
+                    <Button variant="ghost" size="sm" className="hover:bg-red-500/10 hover:text-red-500 transition-colors">
                         Sign Out
-
                     </Button>
-
                 </form>
-
             )}
-
         >
+            <div className="space-y-6 animate-in fade-in duration-500">
 
-            <div className="space-y-6">
+                {/* 1. Hero Section (Full Width) */}
+                <TenantDashboardHero
+                    userName={user.email?.split('@')[0] ?? 'Tenant'}
+                    nextBillDate={nextDueInvoice?.due_date}
+                    openIssuesCount={unresolvedGrievances + openWorkOrders}
+                    leaseEndDate={leaseEnd}
+                />
 
-                <Card>
+                {/* 2. Bento Grid Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6">
 
-                    <CardHeader>
+                    {/* Left Column: Quick Actions & Status (2 cols wide) */}
+                    <div className="md:col-span-2 space-y-6">
+                        {/* Quick Actions Tile */}
+                        <div className="bg-card/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg">
+                            <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Actions</h3>
+                            <TenantQuickActions />
+                        </div>
 
-                        <CardTitle>Welcome back</CardTitle>
-
-                        <CardDescription>{user.email}</CardDescription>
-
-                    </CardHeader>
-
-                    <CardContent className="space-y-3 text-sm text-muted-foreground">
-
-                        <p className="text-sm text-muted-foreground">
-
-                            {activeAssignment
-
-                                ? `You are currently assigned to ${roomName ?? "a room"}.`
-
-                                : "You are not currently assigned to a room."}
-
-                        </p>
-
-                        {leaseStart && (
-
-                            <p>
-
-                                Lease period:&nbsp;
-
-                                {new Date(leaseStart).toLocaleDateString()}
-
-                                {leaseEnd && (' - ' + new Date(leaseEnd).toLocaleDateString())}
-                            </p>
-
+                        {/* Payment Verification Alert */}
+                        {pendingVerificationCount > 0 && (
+                            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 animate-pulse">
+                                <p className="font-semibold text-sm">Action Required</p>
+                                <p className="text-xs mt-1">
+                                    {pendingVerificationCount} payment proof{pendingVerificationCount > 1 ? 's' : ''} verifying...
+                                </p>
+                            </div>
                         )}
 
-                        <p>
+                        {/* Bills Widget */}
+                        <TenantCollapsibleSection id="bills-section" title="Bills & Payments">
+                            <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                <TenantInvoiceList invoices={invoices} />
+                            </div>
+                        </TenantCollapsibleSection>
+                    </div>
 
-                            {nextDueInvoice
+                    {/* Middle Column: Issues & Maintenance (2-3 cols wide on large screens) */}
+                    <div className="md:col-span-2 lg:col-span-3 space-y-6">
+                        {/* Report Issue Widget */}
+                        <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-card/50 to-background/50 backdrop-blur-md overflow-hidden relative group">
+                            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-xl">Report Issue</CardTitle>
+                                <CardDescription>One-click submission. We'll handle the rest.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <GrievanceForm />
+                            </CardContent>
+                        </div>
 
-                                ? `Next bill is due on ${new Date(nextDueInvoice.due_date).toLocaleDateString()}.`
+                        {/* Active Issues List */}
+                        <TenantCollapsibleSection id="issues-section" title={`My Issues (${unresolvedGrievances})`}>
+                            <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                <GrievanceList
+                                    initialGrievances={grievances}
+                                    userId={user.id}
+                                    workOrderStatusesByGrievance={workOrderStatusesByGrievance}
+                                />
+                            </div>
+                        </TenantCollapsibleSection>
 
-                                : "You have no upcoming bills right now."}
+                        {/* Work Orders */}
+                        <TenantCollapsibleSection title={`Maintenance (${openWorkOrders})`}>
+                            <div className="max-h-[300px] overflow-y-auto">
+                                <WorkOrderList
+                                    tenantId={user.id}
+                                    initialWorkOrders={workOrders as any}
+                                />
+                            </div>
+                        </TenantCollapsibleSection>
+                    </div>
 
-                        </p>
+                    {/* Right Column: Info & Activity (Narrow column) */}
+                    <div className="md:col-span-2 lg:col-span-1 space-y-6">
 
-                        <p>
+                        {/* Announcements */}
+                        <div className="rounded-2xl bg-card/20 backdrop-blur-lg border border-white/5 p-4">
+                            <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">News</h3>
+                            <TenantAnnouncementList announcements={announcements} />
+                        </div>
 
-                            Open issues: {unresolvedGrievances} grievance
+                        {/* Recent Activity Timeline */}
+                        <div className="rounded-2xl bg-card/20 backdrop-blur-lg border border-white/5 p-4">
+                            <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">Timeline</h3>
+                            <div className="max-h-[500px] overflow-y-auto text-xs">
+                                <TenantActivityTimeline
+                                    grievances={grievances}
+                                    invoices={invoices}
+                                    announcements={announcements}
+                                    workOrders={workOrders as any}
+                                />
+                            </div>
+                        </div>
 
-                            {unresolvedGrievances === 1 ? '' : 's'} and {openWorkOrders} work order
+                        {/* Room Info */}
+                        <TenantCollapsibleSection title="My Room" defaultOpen={false}>
+                            <TenantRoomInventory
+                                roomName={roomName}
+                                occupancy={activeAssignment?.room?.occupancy}
+                                items={inventoryItems}
+                            />
+                            {activeAssignment && (
+                                <form
+                                    action={async () => {
+                                        'use server'
+                                        await completeHandoverChecklist('move_in')
+                                    }}
+                                    className="mt-3"
+                                >
+                                    <Button type="submit" variant="outline" size="sm" className="w-full text-xs h-8">
+                                        Confirm Move-In
+                                    </Button>
+                                </form>
+                            )}
+                        </TenantCollapsibleSection>
 
-                            {openWorkOrders === 1 ? '' : 's'}.
+                        {/* Documents */}
+                        <TenantCollapsibleSection id="lease-section" title="Docs" defaultOpen={false}>
+                            <TenantLeaseDocuments initialDocuments={leaseDocuments} />
+                        </TenantCollapsibleSection>
 
-                        </p>
-
-                        {averageResolutionDays !== null && (
-
-                            <p className="text-xs">
-
-                                Your resolved issues are typically closed in{" "}
-
-                                {averageResolutionDays.toFixed(1)} day
-
-                                {averageResolutionDays >= 1.5 ? 's' : ''}.
-
-                            </p>
-
-                        )}
-
-                        {latestAnnouncement ? (
-
-                            <p>
-
-                                Latest announcement:{' '}
-
-                                <span className="font-medium">{latestAnnouncement.title}</span>
-
-                            </p>
-
-                        ) : (
-
-                            <p>All clear: no active announcements right now.</p>
-
-                        )}
-
-                    </CardContent>
-
-                </Card>
-
-
-
-                <div className="flex flex-col gap-2">
-
-                    {pendingVerificationCount > 0 && (
-
-                        <p className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded-md px-3 py-2">
-
-                            You have {pendingVerificationCount} payment proof
-
-                            {pendingVerificationCount > 1 ? 's' : ''} awaiting owner verification.
-
-                        </p>
-
-                    )}
-
-                    <TenantQuickActions />
-
+                        {/* House Rules */}
+                        <div className="pt-2">
+                            <TenantHouseRules />
+                        </div>
+                    </div>
                 </div>
-
-
-
-                <TenantCollapsibleSection id="bills-section" title="Bills &amp; payments">
-
-                    <TenantInvoiceList invoices={invoices || []} />
-
-                </TenantCollapsibleSection>
-
-
-
-                <TenantCollapsibleSection id="lease-section" title="Lease documents">
-
-                    <TenantLeaseDocuments initialDocuments={leaseDocuments || []} />
-
-                </TenantCollapsibleSection>
-
-
-
-                <TenantCollapsibleSection title="House announcements">
-
-                    <TenantAnnouncementList announcements={announcements || []} />
-
-                    <div className="mt-3">
-
-                        <TenantHouseRules />
-
-                    </div>
-
-                </TenantCollapsibleSection>
-
-
-
-                <TenantCollapsibleSection title="My room &amp; inventory">
-
-                    <TenantRoomInventory
-
-                        roomName={roomName}
-
-                        occupancy={activeAssignment?.room?.occupancy}
-
-                        items={inventoryItems || []}
-
-                    />
-
-                    {activeAssignment && (
-
-                        <form
-
-                            action={async () => {
-
-                                'use server'
-
-                                await completeHandoverChecklist('move_in')
-
-                            }}
-
-                            className="mt-3 text-xs text-muted-foreground flex items-center justify-between gap-2"
-
-                        >
-
-                            <span>
-
-                                Once you&apos;ve checked everything in your room, mark the move-in
-
-                                checklist as complete.
-
-                            </span>
-
-                            <Button type="submit" variant="outline" size="sm">
-
-                                Confirm move-in checklist
-
-                            </Button>
-
-                        </form>
-
-                    )}
-
-                </TenantCollapsibleSection>
-
-
-
-                <TenantCollapsibleSection id="issues-section" title="My issues">
-
-                    <Card>
-
-                        <CardHeader>
-
-                            <CardTitle>Report an issue</CardTitle>
-
-                            <CardDescription>
-
-                                Something wrong? Let us know and we&apos;ll fix it.
-
-                            </CardDescription>
-
-                        </CardHeader>
-
-                        <CardContent>
-
-                            <GrievanceForm />
-
-                        </CardContent>
-
-                    </Card>
-
-                    <div className="card-premium p-4 mt-3">
-
-                        <GrievanceList
-
-                            initialGrievances={grievances || []}
-
-                            userId={user.id}
-
-                            workOrderStatusesByGrievance={workOrderStatusesByGrievance}
-
-                        />
-
-                    </div>
-
-                </TenantCollapsibleSection>
-
-
-
-                <TenantCollapsibleSection title="Maintenance work orders">
-
-                    <div className="rounded-xl border bg-card p-4">
-
-                        <WorkOrderList
-
-                            tenantId={user.id}
-
-                            initialWorkOrders={(workOrders as any) || []}
-
-                        />
-
-                    </div>
-
-                </TenantCollapsibleSection>
-
-
-
-                <TenantCollapsibleSection title="Recent activity">
-
-                    <TenantActivityTimeline
-
-                        grievances={grievances || []}
-
-                        invoices={invoices || []}
-
-                        announcements={announcements || []}
-
-                        workOrders={(workOrders as any) || []}
-
-                    />
-
-                </TenantCollapsibleSection>
-
             </div>
-
         </DashboardShell>
-
     )
-
 }

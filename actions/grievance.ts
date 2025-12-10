@@ -16,10 +16,15 @@ const GrievanceSchema = z.object({
 export async function createGrievance(formData: FormData) {
     const supabase = await createClient()
 
+    // 1. Validate Input (Partial)
+    const category = formData.get('category')
+    const description = formData.get('description')
+    const photoFile = formData.get('photo') as File | null
+
     const rawData = {
-        category: formData.get('category'),
-        description: formData.get('description'),
-        photo_url: formData.get('photo_url') || undefined,
+        category,
+        description,
+        photo_url: undefined // Placeholder
     }
 
     const validated = GrievanceSchema.safeParse(rawData)
@@ -29,33 +34,56 @@ export async function createGrievance(formData: FormData) {
         return { error: 'Invalid input data', details: validated.error.flatten() }
     }
 
-    // Get current user (Tenant)
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
+    // 2. Auth Check
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        console.error("createGrievance: No user");
         return { error: 'Unauthorized' }
     }
 
-    // Insert grievance
-    const { error, data } = await supabase
+    // 3. Handle File Upload (if exists)
+    let photoUrl: string | null = null
+    if (photoFile && photoFile.size > 0) {
+        try {
+            const fileExt = photoFile.name.split('.').pop()
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`
+            const { error: uploadError, data } = await supabase.storage
+                .from('grievance-attachments')
+                .upload(fileName, photoFile)
+
+            if (uploadError) {
+                console.error("Upload Error:", uploadError)
+                // Proceed without photo or return error? Let's return error to notify user.
+                return { error: 'Failed to upload photo' }
+            }
+
+            // Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('grievance-attachments')
+                .getPublicUrl(fileName)
+
+            photoUrl = publicUrl
+        } catch (e) {
+            console.error("File processing error", e)
+            return { error: 'Failed to process file' }
+        }
+    }
+
+    // 4. Insert into DB
+    const { error } = await supabase
         .from('grievances')
         .insert({
             tenant_id: user.id,
             category: validated.data.category,
             description: validated.data.description,
-            photo_url: (validated.data.photo_url as string || null),
+            photo_url: photoUrl,
         })
-        .select()
 
     if (error) {
         console.error("createGrievance: insert error", error);
         return { error: error.message }
     }
 
-    revalidatePath('/tenant/dashboard')
+    revalidatePath('/tenant/dashboard') // Update dashboard immediately
     return { success: true }
 }
 

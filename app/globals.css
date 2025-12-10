@@ -51,14 +51,14 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.55 0.2 250);
+  --primary: oklch(0.55 0.12 175);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.55 0.2 250);
+  --secondary-foreground: oklch(0.40 0.12 175);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.488 0.243 264.376);
+  --accent: oklch(0.95 0.02 175);
+  --accent-foreground: oklch(0.55 0.12 175);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.92 0.004 286.32);
@@ -86,13 +86,13 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.141 0.005 285.823);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.70 0.15 264.376);
-  --primary-foreground: oklch(0.141 0.005 285.823);
-  --secondary: oklch(0.274 0.006 286.033);
+  --primary: oklch(0.72 0.12 175);
+  --primary-foreground: oklch(0.14 0.01 175);
+  --secondary: oklch(0.25 0.04 175);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.274 0.006 286.033);
+  --accent: oklch(0.25 0.04 175);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
@@ -130,6 +130,47 @@
 
   .layout-padding {
     @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Gradient Backgrounds */
+  .gradient-blue {
+    @apply bg-gradient-to-br from-blue-500 to-blue-600;
+  }
+
+  .gradient-indigo {
+    @apply bg-gradient-to-br from-indigo-500 to-purple-600;
+  }
+
+  .gradient-teal {
+    @apply bg-gradient-to-br from-teal-500 to-cyan-600;
+  }
+
+  .gradient-emerald {
+    @apply bg-gradient-to-br from-emerald-500 to-green-600;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-border/50 rounded-full hover:bg-border transition-colors;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/30;
+  }
+
+  /* For Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border) / 0.5) transparent;
   }
 }
 

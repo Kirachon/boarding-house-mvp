@@ -1,0 +1,14 @@
+resources
+resources/
+**/antigravity/
+**/chat.js
+
+# Standard ignores
+node_modules/
+.next/
+.git/
+.vercel/
+dist/
+build/
+coverage/
+*.log

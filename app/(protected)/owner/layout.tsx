@@ -41,9 +41,10 @@ export default async function OwnerLayout({ children }: { children: ReactNode })
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-background relative">
       <DashboardSidebar items={ownerNavItems} />
       <main className="flex-1">{children}</main>
+      {/* <ChatWidget currentUserId={user.id} />  -- Commented out until we have a proper use case/tenant selection context, but the component is ready */}
     </div>
   )
 }

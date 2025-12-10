@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { AlertTriangle, TrendingUp, Wrench } from 'lucide-react'
 
@@ -6,7 +5,6 @@ import { logout } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { OwnerGrievanceList } from '@/components/features/owner/owner-grievance-list'
 import { RoomHealthGrid } from '@/components/features/owner/room-health-grid'
-import { RoomAvailabilityPanel } from '@/components/features/owner/room-availability-panel'
 import { DashboardShell } from '@/components/shared/dashboard-shell'
 import { MetricCard } from '@/components/shared/metric-card'
 import { FinanceOverview } from '@/components/features/owner/finance-overview'
@@ -17,6 +15,8 @@ import { ActivityTimeline } from '@/components/features/owner/activity-timeline'
 import { CalendarWidget } from '@/components/features/owner/calendar-widget'
 import { OccupancySparkline } from '@/components/features/owner/occupancy-sparkline'
 import { Database } from '@/types/supabase'
+import { getOwnerDashboardData, getOwnerFinanceMetrics, getOwnerOccupancyMetrics } from '@/lib/data/owner'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function OwnerDashboardPage() {
     const supabase = await createClient()
@@ -24,84 +24,28 @@ export default async function OwnerDashboardPage() {
 
     if (!user) redirect('/login')
 
-    // 1. Fetch Grievances
-    const { data: grievances } = await supabase
-        .from('grievances')
-        .select('*')
-        .order('created_at', { ascending: false })
+    // Fetch all data using DAL
+    const dashboardData = await getOwnerDashboardData()
+    if (!dashboardData) redirect('/login')
 
-    // 2. Fetch Invoices for Finance
-    const { data: invoices } = await supabase
-        .from('invoices')
-        .select('*')
-        .order('due_date', { ascending: false })
+    const { grievances, invoices, rooms, assignments, announcements, workOrders } = dashboardData
 
-    // 3. Fetch Rooms
-    const { data: rooms } = await supabase
-        .from('rooms')
-        .select(`*, inventory_items (*)`)
-        .order('name')
-
-    // 4. Fetch Active Assignments (for Leases)
-    const { data: assignmentData } = await supabase
-        .from('tenant_room_assignments')
-        .select(`
-            id, start_date, end_date, lease_end, is_active,
-            tenant:tenant_id(full_name),
-            room:room_id(name)
-        `)
-        .eq('is_active', true)
-        .order('lease_end', { ascending: true })
-
-    // 5. Fetch Announcements
-    const { data: announcements } = await supabase
-        .from('announcements')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5)
-
-    // 6. Fetch Work Orders (for maintenance overview)
-    const { data: workOrders } = await supabase
-        .from('work_orders')
-        .select('status')
-
-
-    // Calculations
-    const activeCount = grievances?.filter(g => g.status === 'open' || g.status === 'in_progress').length || 0
-
-    // Finance Calculations
-    const allInvoices = invoices || []
-    const totalIncome = allInvoices
-        .filter((i) => i.status === 'paid')
-        .reduce((sum, i) => sum + Number(i.amount), 0)
-
-    const outstanding = allInvoices
-        .filter((i) => i.status === 'unpaid' || i.status === 'pending_verification')
-        .reduce((sum, i) => sum + Number(i.amount), 0)
-
-    const overdue = allInvoices
-        .filter((i) => i.status === 'overdue')
-        .reduce((sum, i) => sum + Number(i.amount), 0)
-
-    const pendingCount = allInvoices.filter((i) => i.status === 'pending_verification').length
-
-    // Occupancy
-    const totalRooms = rooms?.length || 0
-    const occupiedRooms = rooms?.filter(r => r.occupancy === 'occupied').length || 0
-    const occupancyRate = totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0
-
-    const openWorkOrders = (workOrders || []).filter(
+    // Calculate metrics
+    const financeMetrics = await getOwnerFinanceMetrics()
+    const occupancyMetrics = await getOwnerOccupancyMetrics(rooms)
+    const activeGrievances = grievances.filter(g => g.status === 'open' || g.status === 'in_progress').length
+    const openWorkOrders = workOrders.filter(
         (w) => w.status === 'open' || w.status === 'in_progress' || w.status === 'waiting_vendor'
     ).length
 
-    // Transform assignments safely
+    // Transform assignments for type safety
     type AssignmentRow = Database['public']['Tables']['tenant_room_assignments']['Row'] & {
         tenant?: { full_name: string | null } | { full_name: string | null }[] | null
         room?: { name: string | null } | { name: string | null }[] | null
         rooms?: { name: string | null } | null
     }
 
-    const assignments: AssignmentRow[] = (assignmentData || []).map((item) => {
+    const transformedAssignments: AssignmentRow[] = assignments.map((item) => {
         const raw = item as AssignmentRow
         const tenant = Array.isArray(raw.tenant) ? raw.tenant[0] : raw.tenant
         const room = Array.isArray(raw.room) ? raw.room[0] : raw.room
@@ -117,93 +61,97 @@ export default async function OwnerDashboardPage() {
     return (
         <DashboardShell
             title="Owner Command Center"
-            subtitle="Overview of property performance and alerts."
-            action={(
+            subtitle="Property performance at a glance"
+            maxWidthClassName="max-w-[1800px]"
+            action={
                 <form action={logout}>
                     <Button variant="outline" size="sm">Sign Out</Button>
                 </form>
-            )}
+            }
         >
             <div className="space-y-6">
-                {/* Top Section: Quick Actions & Finance */}
-                <div className="flex flex-col gap-6">
-                    <QuickActions />
-                    <FinanceOverview
-                        totalIncome={totalIncome}
-                        outstanding={outstanding}
-                        overdue={overdue}
-                        pendingCount={pendingCount}
-                    />
-                </div>
+                {/* Quick Actions */}
+                <QuickActions />
 
-                {/* Main Grid Layout */}
-                <div className="grid gap-6 lg:grid-cols-3">
+                {/* Finance Overview - Full Width */}
+                <FinanceOverview
+                    totalIncome={financeMetrics.totalIncome}
+                    outstanding={financeMetrics.outstanding}
+                    overdue={financeMetrics.overdue}
+                    pendingCount={financeMetrics.pendingCount}
+                />
 
-                    {/* Left Column (2/3) */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Property Vitals */}
-                        <div className="grid gap-4 md:grid-cols-3">
-                            <MetricCard
-                                label="Occupancy Rate"
-                                value={`${occupancyRate}%`}
-                                helperText={`${occupiedRooms}/${totalRooms} rooms occupied`}
-                                icon={<TrendingUp />}
-                            >
-                                <OccupancySparkline rooms={rooms || []} />
-                            </MetricCard>
-                            <MetricCard
-                                label="Active Issues"
-                                value={activeCount}
-                                helperText={activeCount > 0 ? "Requires attention" : "All good"}
-                                icon={<AlertTriangle className={activeCount > 0 ? "text-amber-500" : "text-green-500"} />}
-                            />
-                            <MetricCard
-                                label="Open Work Orders"
-                                value={openWorkOrders}
-                                helperText={openWorkOrders > 0 ? "In progress with vendors" : "No active maintenance jobs"}
-                                icon={<Wrench />}
-                            />
-                        </div>
+                {/* Bento Grid Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6">
 
+                    {/* Property Vitals - 3 columns on desktop */}
+                    <div className="md:col-span-2 lg:col-span-2">
+                        <MetricCard
+                            label="Occupancy Rate"
+                            value={`${occupancyMetrics.occupancyRate}%`}
+                            helperText={`${occupancyMetrics.occupiedRooms}/${occupancyMetrics.totalRooms} rooms occupied`}
+                            icon={<TrendingUp className={occupancyMetrics.occupancyRate > 80 ? "text-emerald-500" : "text-amber-500"} />}
+                        >
+                            <OccupancySparkline rooms={rooms} />
+                        </MetricCard>
+                    </div>
+
+                    <div className="md:col-span-1 lg:col-span-2">
+                        <MetricCard
+                            label="Active Issues"
+                            value={activeGrievances}
+                            helperText={activeGrievances > 0 ? "Requires attention" : "All good"}
+                            icon={<AlertTriangle className={activeGrievances > 0 ? "text-amber-500" : "text-green-500"} />}
+                        />
+                    </div>
+
+                    <div className="md:col-span-1 lg:col-span-2">
+                        <MetricCard
+                            label="Open Work Orders"
+                            value={openWorkOrders}
+                            helperText={openWorkOrders > 0 ? "In progress" : "No maintenance"}
+                            icon={<Wrench className={openWorkOrders > 0 ? "text-blue-500" : "text-slate-400"} />}
+                        />
+                    </div>
+
+                    {/* Room Status - Wide Section */}
+                    <div className="md:col-span-4 lg:col-span-4">
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-semibold tracking-tight">Room Status</h2>
-                            </div>
-                            <RoomHealthGrid rooms={rooms || []} />
-                        </div>
-
-                        <div className="hidden lg:block">
-                            {/* Hide Availability Panel on mobile/default if redundant, or keep it */}
-                            <RoomAvailabilityPanel rooms={rooms || []} />
+                            <h2 className="text-lg font-semibold tracking-tight">Room Status Overview</h2>
+                            <RoomHealthGrid rooms={rooms} />
                         </div>
                     </div>
 
-                    {/* Right Column (1/3) - Sidebar Widgets */}
-                    <div className="space-y-6">
-                        {/* NEW: Calendar Widget */}
+                    {/* Right Sidebar - Calendar & Activity */}
+                    <div className="md:col-span-4 lg:col-span-2 space-y-6">
                         <CalendarWidget
-                            invoices={invoices || []}
-                            assignments={assignments}
+                            invoices={invoices}
+                            assignments={transformedAssignments}
                         />
 
-                        {/* NEW: Activity Timeline */}
                         <ActivityTimeline
-                            grievances={grievances || []}
-                            invoices={invoices || []}
-                            announcements={announcements || []}
+                            grievances={grievances}
+                            invoices={invoices}
+                            announcements={announcements}
                         />
 
-                        <LeaseExpiryAlert assignments={assignments} />
+                        <LeaseExpiryAlert assignments={transformedAssignments} />
+                    </div>
 
-                        <div className="h-[300px]">
-                            <AnnouncementWidget announcements={announcements || []} />
+                    {/* Announcements Widget */}
+                    <div className="md:col-span-2 lg:col-span-3">
+                        <div className="h-[350px]">
+                            <AnnouncementWidget announcements={announcements} />
                         </div>
+                    </div>
 
+                    {/* Grievances List */}
+                    <div className="md:col-span-2 lg:col-span-3">
                         <div className="space-y-3">
                             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                                 Support Inbox
                             </h2>
-                            <OwnerGrievanceList initialGrievances={grievances || []} />
+                            <OwnerGrievanceList initialGrievances={grievances} />
                         </div>
                     </div>
                 </div>

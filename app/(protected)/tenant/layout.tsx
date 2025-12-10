@@ -10,6 +10,7 @@ import {
   UserCircle2,
   Bell,
 } from 'lucide-react'
+import { MobileNav } from '@/components/shared/mobile-nav'
 
 const tenantNavItems: DashboardNavItem[] = [
   { label: 'Home', href: '/tenant/dashboard', icon: <Home className="h-4 w-4" /> },
@@ -36,9 +37,10 @@ export default async function TenantLayout({ children }: { children: ReactNode }
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-background pb-16 md:pb-0">
       <DashboardSidebar items={tenantNavItems} />
       <main className="flex-1">{children}</main>
+      <MobileNav />
     </div>
   )
 }
