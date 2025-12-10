@@ -32,8 +32,8 @@ export function DashboardSidebar({ items }: DashboardSidebarProps) {
               className={cn(
                 'group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
+                  ? 'bg-primary/10 text-primary shadow-sm'
+                  : 'text-muted-foreground hover:bg-primary/5 hover:text-foreground hover:translate-x-1',
               )}
             >
               {item.icon && (

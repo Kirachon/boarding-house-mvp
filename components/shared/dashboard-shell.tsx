@@ -3,6 +3,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { DarkModeToggle } from './dark-mode-toggle'
 import { NotificationBell } from './notification-bell'
+import { PageTransition } from './page-transition'
 
 interface DashboardShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: React.ReactNode
@@ -23,7 +24,7 @@ export function DashboardShell({
   return (
     <div
       className={cn(
-        'min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 transition-colors duration-500',
+        'min-h-screen transition-colors duration-500',
         className,
       )}
       {...props}
@@ -56,7 +57,9 @@ export function DashboardShell({
           </header>
         )}
 
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </div>
     </div>
   )
