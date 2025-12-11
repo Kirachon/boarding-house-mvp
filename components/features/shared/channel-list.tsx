@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Hash, User, MessageCircle, AlertCircle, Briefcase } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils'
+import { NewChatDialog } from './new-chat-dialog'
 
 interface ChannelListProps {
     currentUserId: string
@@ -19,6 +20,7 @@ interface ChannelListProps {
 export function ChannelList({ currentUserId, onSelectChannel, className }: ChannelListProps) {
     const [channels, setChannels] = useState<ChatChannel[]>([])
     const [loading, setLoading] = useState(true)
+    const [openNewChat, setOpenNewChat] = useState(false)
 
     useEffect(() => {
         loadChannels()
@@ -31,6 +33,15 @@ export function ChannelList({ currentUserId, onSelectChannel, className }: Chann
             setChannels(data)
         }
         setLoading(false)
+    }
+
+    const handleChannelCreated = (channel: ChatChannel) => {
+        // Add to list if not exists, then select
+        setChannels(prev => {
+            if (prev.find(c => c.id === channel.id)) return prev
+            return [channel, ...prev]
+        })
+        onSelectChannel(channel)
     }
 
     const getChannelIcon = (type: string) => {
@@ -52,12 +63,21 @@ export function ChannelList({ currentUserId, onSelectChannel, className }: Chann
 
     return (
         <Card className={cn("h-full flex flex-col shadow-none border-0", className)}>
-            <CardHeader className="p-4 border-b">
+            <CardHeader className="p-4 border-b flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <MessageCircle className="h-5 w-5" />
                     Messages
                 </CardTitle>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setOpenNewChat(true)}>
+                    <User className="h-4 w-4" />
+                    <span className="sr-only">New Chat</span>
+                </Button>
             </CardHeader>
+            <NewChatDialog
+                open={openNewChat}
+                onOpenChange={setOpenNewChat}
+                onChannelCreated={handleChannelCreated}
+            />
             <CardContent className="p-0 flex-1 overflow-hidden">
                 <ScrollArea className="h-full">
                     {loading ? (
