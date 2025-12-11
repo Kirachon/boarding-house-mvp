@@ -9,276 +9,335 @@ export type Json =
 export type Database = {
     // Allows to automatically instantiate createClient with right options
     // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+    __InternalSupabase: {
+        PostgrestVersion: "13.0.5"
+    }
     public: {
         Tables: {
             announcements: {
                 Row: {
-                    id: string
-                    title: string
                     content: string
-                    is_active: boolean
-                    created_at: string
+                    created_at: string | null
                     created_by: string | null
+                    id: string
+                    is_active: boolean | null
+                    title: string
                 }
                 Insert: {
-                    id?: string
-                    title: string
                     content: string
-                    is_active?: boolean
-                    created_at?: string
+                    created_at?: string | null
                     created_by?: string | null
+                    id?: string
+                    is_active?: boolean | null
+                    title: string
                 }
                 Update: {
-                    id?: string
-                    title?: string
                     content?: string
-                    is_active?: boolean
-                    created_at?: string
+                    created_at?: string | null
                     created_by?: string | null
+                    id?: string
+                    is_active?: boolean | null
+                    title?: string
                 }
                 Relationships: []
             }
-            expenses: {
+            channel_members: {
                 Row: {
-                    id: string
-                    category: string
-                    amount: number
-                    description: string | null
-                    expense_date: string
-                    created_at: string
+                    channel_id: string
+                    joined_at: string | null
+                    last_read_at: string | null
+                    role: Database["public"]["Enums"]["channel_role"]
+                    user_id: string
                 }
                 Insert: {
-                    id?: string
-                    category: string
-                    amount: number
-                    description?: string | null
-                    expense_date?: string
-                    created_at?: string
+                    channel_id: string
+                    joined_at?: string | null
+                    last_read_at?: string | null
+                    role?: Database["public"]["Enums"]["channel_role"]
+                    user_id: string
                 }
                 Update: {
+                    channel_id?: string
+                    joined_at?: string | null
+                    last_read_at?: string | null
+                    role?: Database["public"]["Enums"]["channel_role"]
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "channel_members_channel_id_fkey"
+                        columns: ["channel_id"]
+                        isOneToOne: false
+                        referencedRelation: "chat_channels"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            chat_channels: {
+                Row: {
+                    context_id: string | null
+                    created_at: string | null
+                    id: string
+                    last_message_at: string | null
+                    metadata: Json | null
+                    name: string | null
+                    type: Database["public"]["Enums"]["channel_type"]
+                }
+                Insert: {
+                    context_id?: string | null
+                    created_at?: string | null
                     id?: string
-                    category?: string
-                    amount?: number
-                    description?: string | null
-                    expense_date?: string
-                    created_at?: string
+                    last_message_at?: string | null
+                    metadata?: Json | null
+                    name?: string | null
+                    type?: Database["public"]["Enums"]["channel_type"]
+                }
+                Update: {
+                    context_id?: string | null
+                    created_at?: string | null
+                    id?: string
+                    last_message_at?: string | null
+                    metadata?: Json | null
+                    name?: string | null
+                    type?: Database["public"]["Enums"]["channel_type"]
                 }
                 Relationships: []
+            }
+            grievance_attachments: {
+                Row: {
+                    created_at: string | null
+                    file_name: string
+                    file_path: string
+                    file_size: number
+                    file_type: string
+                    grievance_id: string
+                    id: string
+                }
+                Insert: {
+                    created_at?: string | null
+                    file_name: string
+                    file_path: string
+                    file_size: number
+                    file_type: string
+                    grievance_id: string
+                    id?: string
+                }
+                Update: {
+                    created_at?: string | null
+                    file_name?: string
+                    file_path?: string
+                    file_size?: number
+                    file_type?: string
+                    grievance_id?: string
+                    id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "grievance_attachments_grievance_id_fkey"
+                        columns: ["grievance_id"]
+                        isOneToOne: false
+                        referencedRelation: "grievances"
+                        referencedColumns: ["id"]
+                    },
+                ]
             }
             grievances: {
                 Row: {
                     category: Database["public"]["Enums"]["grievance_category"]
-                    created_at: string
+                    created_at: string | null
                     description: string
                     id: string
-                    photo_url: string | null
                     status: Database["public"]["Enums"]["grievance_status"]
                     tenant_id: string
-                    updated_at: string
+                    updated_at: string | null
                 }
                 Insert: {
                     category: Database["public"]["Enums"]["grievance_category"]
-                    created_at?: string
+                    created_at?: string | null
                     description: string
                     id?: string
-                    photo_url?: string | null
                     status?: Database["public"]["Enums"]["grievance_status"]
                     tenant_id: string
-                    updated_at?: string
+                    updated_at?: string | null
                 }
                 Update: {
                     category?: Database["public"]["Enums"]["grievance_category"]
-                    created_at?: string
+                    created_at?: string | null
                     description?: string
                     id?: string
-                    photo_url?: string | null
                     status?: Database["public"]["Enums"]["grievance_status"]
                     tenant_id?: string
-                    updated_at?: string
+                    updated_at?: string | null
                 }
                 Relationships: []
             }
             inventory_items: {
                 Row: {
                     condition: Database["public"]["Enums"]["item_condition"]
+                    created_at: string | null
                     id: string
-                    last_checked: string
                     name: string
-                    room_id: string | null
+                    quantity: number
                 }
                 Insert: {
-                    condition?: Database["public"]["Enums"]["item_condition"]
+                    condition: Database["public"]["Enums"]["item_condition"]
+                    created_at?: string | null
                     id?: string
-                    last_checked?: string
                     name: string
-                    room_id?: string | null
+                    quantity?: number
                 }
                 Update: {
                     condition?: Database["public"]["Enums"]["item_condition"]
+                    created_at?: string | null
                     id?: string
-                    last_checked?: string
-                    name: string
-                    room_id?: string | null
+                    name?: string
+                    quantity?: number
                 }
-                Relationships: [
-                    {
-                        foreignKeyName: "inventory_items_room_id_fkey"
-                        columns: ["room_id"]
-                        isOneToOne: false
-                        referencedRelation: "rooms"
-                        referencedColumns: ["id"]
-                    },
-                ]
+                Relationships: []
             }
             invoices: {
                 Row: {
                     amount: number
-                    created_at: string
-                    description: string
+                    created_at: string | null
                     due_date: string
                     id: string
                     status: Database["public"]["Enums"]["invoice_status"]
                     tenant_id: string
-                    updated_at: string
-                    proof_image_url: string | null
                 }
                 Insert: {
                     amount: number
-                    created_at?: string
-                    description?: string
+                    created_at?: string | null
                     due_date: string
                     id?: string
                     status?: Database["public"]["Enums"]["invoice_status"]
                     tenant_id: string
-                    updated_at?: string
-                    proof_image_url?: string | null
                 }
                 Update: {
                     amount?: number
-                    created_at?: string
-                    description?: string
+                    created_at?: string | null
                     due_date?: string
                     id?: string
                     status?: Database["public"]["Enums"]["invoice_status"]
                     tenant_id?: string
-                    updated_at?: string
-                    proof_image_url?: string | null
                 }
                 Relationships: []
             }
-            notifications: {
+            message_attachments: {
                 Row: {
+                    created_at: string | null
+                    file_path: string
+                    file_size: number
+                    file_type: string
                     id: string
-                    user_id: string
-                    title: string
-                    message: string
-                    type: "info" | "warning" | "success" | "error"
-                    link: string | null
-                    is_read: boolean
-                    created_at: string
+                    message_id: string | null
                 }
                 Insert: {
+                    created_at?: string | null
+                    file_path: string
+                    file_size: number
+                    file_type: string
                     id?: string
-                    user_id: string
-                    title: string
-                    message: string
-                    type?: "info" | "warning" | "success" | "error"
-                    link?: string | null
-                    is_read?: boolean
-                    created_at?: string
+                    message_id?: string | null
                 }
                 Update: {
+                    created_at?: string | null
+                    file_path?: string
+                    file_size?: number
+                    file_type?: string
                     id?: string
-                    user_id?: string
-                    title?: string
-                    message?: string
-                    type?: "info" | "warning" | "success" | "error"
-                    link?: string | null
-                    is_read?: boolean
-                    created_at?: string
+                    message_id?: string | null
                 }
-                Relationships: []
+                Relationships: [
+                    {
+                        foreignKeyName: "message_attachments_message_id_fkey"
+                        columns: ["message_id"]
+                        isOneToOne: false
+                        referencedRelation: "messages"
+                        referencedColumns: ["id"]
+                    },
+                ]
             }
-            profiles: {
+            messages: {
                 Row: {
-                    created_at: string
-                    full_name: string | null
+                    channel_id: string | null
+                    content: string
+                    created_at: string | null
                     id: string
-                    role: Database["public"]["Enums"]["user_role"]
+                    read_at: string | null
+                    receiver_id: string | null
+                    sender_id: string
                 }
                 Insert: {
-                    created_at?: string
-                    full_name?: string | null
-                    id: string
-                    role?: Database["public"]["Enums"]["user_role"]
+                    channel_id?: string | null
+                    content: string
+                    created_at?: string | null
+                    id?: string
+                    read_at?: string | null
+                    receiver_id?: string | null
+                    sender_id: string
                 }
                 Update: {
-                    created_at?: string
-                    full_name?: string | null
+                    channel_id?: string | null
+                    content?: string
+                    created_at?: string | null
                     id?: string
-                    role?: Database["public"]["Enums"]["user_role"]
+                    read_at?: string | null
+                    receiver_id?: string | null
+                    sender_id?: string
                 }
-                Relationships: []
+                Relationships: [
+                    {
+                        foreignKeyName: "messages_channel_id_fkey"
+                        columns: ["channel_id"]
+                        isOneToOne: false
+                        referencedRelation: "chat_channels"
+                        referencedColumns: ["id"]
+                    },
+                ]
             }
             properties: {
                 Row: {
                     address: string
-                    amenities: string[] | null
-                    city: string | null
-                    created_at: string
-                    description: string | null
+                    created_at: string | null
                     id: string
-                    is_verified: boolean
                     name: string
-                    owner_id: string
                 }
                 Insert: {
                     address: string
-                    amenities?: string[] | null
-                    created_at?: string
-                    description?: string | null
+                    created_at?: string | null
                     id?: string
-                    is_verified?: boolean
                     name: string
-                    owner_id: string
                 }
                 Update: {
                     address?: string
-                    amenities?: string[] | null
-                    created_at?: string
-                    description?: string | null
+                    created_at?: string | null
                     id?: string
-                    is_verified?: boolean
                     name?: string
-                    owner_id?: string
                 }
                 Relationships: []
             }
             rooms: {
                 Row: {
-                    capacity: number
-                    created_at: string
+                    created_at: string | null
                     id: string
                     name: string
-                    occupancy: Database["public"]["Enums"]["room_occupancy"]
+                    occupancy_status: Database["public"]["Enums"]["room_occupancy"]
                     price: number
                     property_id: string | null
                 }
                 Insert: {
-                    capacity?: number
-                    created_at?: string
+                    created_at?: string | null
                     id?: string
                     name: string
-                    occupancy?: Database["public"]["Enums"]["room_occupancy"]
-                    price?: number
+                    occupancy_status?: Database["public"]["Enums"]["room_occupancy"]
+                    price: number
                     property_id?: string | null
                 }
                 Update: {
-                    capacity?: number
-                    created_at?: string
+                    created_at?: string | null
                     id?: string
                     name?: string
-                    occupancy?: Database["public"]["Enums"]["room_occupancy"]
+                    occupancy_status?: Database["public"]["Enums"]["room_occupancy"]
                     price?: number
                     property_id?: string | null
                 }
@@ -292,100 +351,61 @@ export type Database = {
                     },
                 ]
             }
-            documents: {
+            service_requests: {
                 Row: {
+                    created_at: string | null
+                    description: string | null
                     id: string
-                    tenant_id: string | null
-                    title: string
-                    type: string
-                    file_url: string
-                    created_at: string
+                    status: string | null
+                    title: string | null
+                    updated_at: string | null
+                    user_id: string | null
                 }
                 Insert: {
+                    created_at?: string | null
+                    description?: string | null
                     id?: string
-                    tenant_id?: string | null
-                    title: string
-                    type: string
-                    file_url: string
-                    created_at?: string
+                    status?: string | null
+                    title?: string | null
+                    updated_at?: string | null
+                    user_id?: string | null
                 }
                 Update: {
+                    created_at?: string | null
+                    description?: string | null
                     id?: string
-                    tenant_id?: string | null
-                    title?: string
-                    type?: string
-                    file_url?: string
-                    created_at?: string
+                    status?: string | null
+                    title?: string | null
+                    updated_at?: string | null
+                    user_id?: string | null
                 }
                 Relationships: []
             }
-            vendors: {
+            tenant_assignments: {
                 Row: {
+                    assign_date: string | null
                     id: string
-                    name: string
-                    phone: string | null
-                    email: string | null
-                    services: string | null
-                    notes: string | null
-                    created_at: string
-                }
-                Insert: {
-                    id?: string
-                    name: string
-                    phone?: string | null
-                    email?: string | null
-                    services?: string | null
-                    notes?: string | null
-                    created_at?: string
-                }
-                Update: {
-                    id?: string
-                    name?: string
-                    phone?: string | null
-                    email?: string | null
-                    services?: string | null
-                    notes?: string | null
-                    created_at?: string
-                }
-                Relationships: []
-            }
-            tenant_room_assignments: {
-                Row: {
-                    created_at: string
-                    end_date: string | null
-                    lease_start: string | null
-                    lease_end: string | null
-                    id: string
-                    is_active: boolean
                     room_id: string
-                    start_date: string
+                    status: string | null
                     tenant_id: string
                 }
                 Insert: {
-                    created_at?: string
-                    end_date?: string | null
-                    lease_start?: string | null
-                    lease_end?: string | null
+                    assign_date?: string | null
                     id?: string
-                    is_active?: boolean
                     room_id: string
-                    start_date?: string
+                    status?: string | null
                     tenant_id: string
                 }
                 Update: {
-                    created_at?: string
-                    end_date?: string | null
-                    lease_start?: string | null
-                    lease_end?: string | null
+                    assign_date?: string | null
                     id?: string
-                    is_active?: boolean
                     room_id?: string
-                    start_date?: string
+                    status?: string | null
                     tenant_id?: string
                 }
                 Relationships: [
                     {
-                        foreignKeyName: "tenant_room_assignments_room_id_fkey"
+                        foreignKeyName: "tenant_assignments_room_id_fkey"
                         columns: ["room_id"]
                         isOneToOne: false
                         referencedRelation: "rooms"
@@ -395,96 +415,47 @@ export type Database = {
             }
             work_orders: {
                 Row: {
+                    assigned_to: string | null
+                    created_at: string | null
+                    description: string
                     id: string
-                    grievance_id: string | null
-                    room_id: string | null
-                    tenant_id: string | null
-                    vendor_id: string | null
-                    title: string
-                    description: string | null
                     priority: Database["public"]["Enums"]["work_order_priority"]
+                    property_id: string
                     status: Database["public"]["Enums"]["work_order_status"]
-                    scheduled_date: string | null
-                    due_date: string | null
-                    completed_at: string | null
-                    labor_cost: number | null
-                    materials_cost: number | null
-                    total_cost: number | null
-                    created_at: string
-                    updated_at: string
-                }
-                Insert: {
-                    id?: string
-                    grievance_id?: string | null
-                    room_id?: string | null
-                    tenant_id?: string | null
-                    vendor_id?: string | null
                     title: string
-                    description?: string | null
-                    priority?: Database["public"]["Enums"]["work_order_priority"]
-                    status?: Database["public"]["Enums"]["work_order_status"]
-                    scheduled_date?: string | null
-                    due_date?: string | null
-                    completed_at?: string | null
-                    labor_cost?: number | null
-                    materials_cost?: number | null
-                    total_cost?: number | null
-                    created_at?: string
-                    updated_at?: string
-                }
-                Update: {
-                    id?: string
-                    grievance_id?: string | null
-                    room_id?: string | null
-                    tenant_id?: string | null
-                    vendor_id?: string | null
-                    title?: string
-                    description?: string | null
-                    priority?: Database["public"]["Enums"]["work_order_priority"]
-                    status?: Database["public"]["Enums"]["work_order_status"]
-                    scheduled_date?: string | null
-                    due_date?: string | null
-                    completed_at?: string | null
-                    labor_cost?: number | null
-                    materials_cost?: number | null
-                    total_cost?: number | null
-                    created_at?: string
-                    updated_at?: string
-                }
-                Relationships: []
-            }
-            room_handover_checklists: {
-                Row: {
-                    id: string
-                    tenant_id: string
-                    room_id: string | null
-                    type: string
-                    is_completed: boolean
-                    notes: string | null
-                    created_at: string
-                    completed_at: string | null
+                    updated_at: string | null
                 }
                 Insert: {
+                    assigned_to?: string | null
+                    created_at?: string | null
+                    description: string
                     id?: string
-                    tenant_id: string
-                    room_id?: string | null
-                    type: string
-                    is_completed?: boolean
-                    notes?: string | null
-                    created_at?: string
-                    completed_at?: string | null
+                    priority?: Database["public"]["Enums"]["work_order_priority"]
+                    property_id: string
+                    status?: Database["public"]["Enums"]["work_order_status"]
+                    title: string
+                    updated_at?: string | null
                 }
                 Update: {
+                    assigned_to?: string | null
+                    created_at?: string | null
+                    description?: string
                     id?: string
-                    tenant_id?: string
-                    room_id?: string | null
-                    type?: string
-                    is_completed?: boolean
-                    notes?: string | null
-                    created_at?: string
-                    completed_at?: string | null
+                    priority?: Database["public"]["Enums"]["work_order_priority"]
+                    property_id?: string
+                    status?: Database["public"]["Enums"]["work_order_status"]
+                    title?: string
+                    updated_at?: string | null
                 }
-                Relationships: []
+                Relationships: [
+                    {
+                        foreignKeyName: "work_orders_property_id_fkey"
+                        columns: ["property_id"]
+                        isOneToOne: false
+                        referencedRelation: "properties"
+                        referencedColumns: ["id"]
+                    },
+                ]
             }
         }
         Views: {
@@ -494,14 +465,31 @@ export type Database = {
             [_ in never]: never
         }
         Enums: {
+            channel_role: "owner" | "admin" | "member"
+            channel_type:
+            | "direct"
+            | "group"
+            | "announcement"
+            | "work_order"
+            | "grievance"
             grievance_category: "wifi" | "cleaning" | "maintenance" | "other"
             grievance_status: "open" | "in_progress" | "resolved" | "rejected"
-            invoice_status: "unpaid" | "paid" | "overdue" | "cancelled" | "pending_verification"
+            invoice_status:
+            | "unpaid"
+            | "paid"
+            | "overdue"
+            | "cancelled"
+            | "pending_verification"
             item_condition: "good" | "fair" | "poor" | "broken"
             room_occupancy: "vacant" | "occupied" | "maintenance"
-            work_order_status: "open" | "in_progress" | "waiting_vendor" | "completed" | "cancelled"
-            work_order_priority: "low" | "medium" | "high"
             user_role: "owner" | "tenant" | "guest" | "admin"
+            work_order_priority: "low" | "medium" | "high"
+            work_order_status:
+            | "open"
+            | "in_progress"
+            | "waiting_vendor"
+            | "completed"
+            | "cancelled"
         }
         CompositeTypes: {
             [_ in never]: never
@@ -600,8 +588,45 @@ export type CompositeTypes<
     }
     ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+> = PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+}
     ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
     : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+    public: {
+        Enums: {
+            channel_role: ["owner", "admin", "member"],
+            channel_type: [
+                "direct",
+                "group",
+                "announcement",
+                "work_order",
+                "grievance",
+            ],
+            grievance_category: ["wifi", "cleaning", "maintenance", "other"],
+            grievance_status: ["open", "in_progress", "resolved", "rejected"],
+            invoice_status: [
+                "unpaid",
+                "paid",
+                "overdue",
+                "cancelled",
+                "pending_verification",
+            ],
+            item_condition: ["good", "fair", "poor", "broken"],
+            room_occupancy: ["vacant", "occupied", "maintenance"],
+            user_role: ["owner", "tenant", "guest", "admin"],
+            work_order_priority: ["low", "medium", "high"],
+            work_order_status: [
+                "open",
+                "in_progress",
+                "waiting_vendor",
+                "completed",
+                "cancelled",
+            ],
+        },
+    },
+} as const

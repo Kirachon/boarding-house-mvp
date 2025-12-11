@@ -103,7 +103,7 @@ export function WorkOrderList({ initialWorkOrders, tenantId }: WorkOrderListProp
               </p>
             )}
             <p className="text-[11px] text-muted-foreground">
-              Created {new Date(wo.created_at).toLocaleDateString()}
+              Created {new Date(wo.created_at ?? '').toLocaleDateString()}
             </p>
           </div>
         )
