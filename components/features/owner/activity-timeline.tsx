@@ -29,15 +29,15 @@ export function ActivityTimeline({ grievances, invoices, announcements }: Activi
             type: 'grievance' as const,
             title: `${g.category} Issue Reported`,
             description: g.description.slice(0, 50) + (g.description.length > 50 ? '...' : ''),
-            date: g.created_at,
+            date: g.created_at ?? '',
             status: g.status
         })),
         ...invoices.slice(0, 3).map(i => ({
             id: i.id,
             type: 'invoice' as const,
             title: i.status === 'paid' ? 'Payment Received' : 'Invoice Created',
-            description: `$${i.amount.toFixed(2)} - ${i.description}`,
-            date: i.updated_at || i.created_at,
+            description: `$${i.amount.toFixed(2)} - ${(i as any).description ?? 'Invoice'}`,
+            date: (i as any).updated_at || i.created_at || '',
             status: i.status
         })),
         ...announcements.slice(0, 2).map(a => ({
@@ -45,7 +45,7 @@ export function ActivityTimeline({ grievances, invoices, announcements }: Activi
             type: 'announcement' as const,
             title: 'Announcement Posted',
             description: a.title,
-            date: a.created_at
+            date: a.created_at ?? ''
         }))
     ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
 

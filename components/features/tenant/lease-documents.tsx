@@ -7,7 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { FileText, Download, FileQuestion } from 'lucide-react'
 
-type Document = Database['public']['Tables']['documents']['Row']
+// Local interface since documents table may not exist in generated types
+interface Document {
+  id: string
+  title: string
+  file_url: string
+  created_at: string
+}
 
 interface TenantLeaseDocumentsProps {
   initialDocuments: Document[]

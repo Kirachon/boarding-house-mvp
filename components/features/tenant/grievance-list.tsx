@@ -79,7 +79,7 @@ export function GrievanceList({ initialGrievances, userId, workOrderStatusesByGr
                                 <p className="text-sm text-muted-foreground line-clamp-2">{grievance.description}</p>
                             </div>
                             <span className="text-xs text-muted-foreground">
-                                {new Date(grievance.created_at).toLocaleDateString()}
+                                {new Date(grievance.created_at ?? '').toLocaleDateString()}
                             </span>
                         </div>
 

@@ -36,7 +36,7 @@ export function TenantDialog({ rooms }: TenantDialogProps) {
     const [createdUser, setCreatedUser] = useState<{ email: string, pass: string } | null>(null)
 
     // Filter only vacant rooms
-    const vacantRooms = rooms.filter(r => r.occupancy === 'vacant')
+    const vacantRooms = rooms.filter(r => r.occupancy_status === 'vacant')
 
     const handleSubmit = async (formData: FormData) => {
         const res = await inviteTenant(formData)

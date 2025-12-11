@@ -35,7 +35,7 @@ export function TenantActivityTimeline({
       type: 'grievance' as const,
       title: 'Issue reported',
       description: g.description.slice(0, 60) + (g.description.length > 60 ? '…' : ''),
-      date: g.created_at,
+      date: g.created_at ?? '',
       status: g.status,
     })),
     ...workOrders.slice(0, 3).map((w) => ({
@@ -43,15 +43,15 @@ export function TenantActivityTimeline({
       type: 'work_order' as const,
       title: 'Maintenance work order',
       description: w.title,
-      date: w.updated_at || w.created_at,
+      date: (w as any).updated_at || w.created_at || '',
       status: w.status,
     })),
     ...invoices.slice(0, 3).map((i) => ({
       id: i.id,
       type: 'invoice' as const,
       title: i.status === 'paid' ? 'Payment recorded' : 'Bill created',
-      description: `${i.description} – ₱${i.amount.toFixed(2)}`,
-      date: i.updated_at || i.created_at,
+      description: `${(i as any).description ?? 'Invoice'} – ₱${i.amount.toFixed(2)}`,
+      date: (i as any).updated_at || i.created_at || '',
       status: i.status,
     })),
     ...announcements.slice(0, 2).map((a) => ({
@@ -59,7 +59,7 @@ export function TenantActivityTimeline({
       type: 'announcement' as const,
       title: 'Announcement',
       description: a.title,
-      date: a.created_at,
+      date: a.created_at ?? '',
     })),
   ]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())

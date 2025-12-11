@@ -17,8 +17,15 @@ import { Database } from '@/types/supabase'
 import { CheckCircle2, XCircle, ExternalLink, Receipt } from 'lucide-react'
 import Image from 'next/image'
 
+// Local interface since profiles table may not exist in generated types
+interface Profile {
+    id: string
+    full_name: string | null
+}
+
 type Invoice = Database['public']['Tables']['invoices']['Row'] & {
-    profiles: Database['public']['Tables']['profiles']['Row'] | null
+    profiles: Profile | null
+    proof_image_url?: string | null
 }
 
 interface PaymentVerificationDialogProps {

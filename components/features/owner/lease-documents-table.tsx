@@ -15,8 +15,18 @@ import { deleteLeaseDocument } from '@/actions/owner-documents'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 
-type Document = Database['public']['Tables']['documents']['Row'] & {
-  profiles?: Database['public']['Tables']['profiles']['Row'] | null
+// Local interfaces since these tables may not exist in generated types
+interface Profile {
+  id: string
+  full_name: string | null
+}
+
+interface Document {
+  id: string
+  title: string
+  file_url: string
+  created_at: string
+  profiles?: Profile | null
 }
 
 interface LeaseDocumentsTableProps {

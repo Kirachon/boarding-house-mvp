@@ -5,7 +5,7 @@ import { Database } from '@/types/supabase'
 import { CalendarDays, Clock, Home, DollarSign } from 'lucide-react'
 
 type Invoice = Database['public']['Tables']['invoices']['Row']
-type Assignment = Database['public']['Tables']['tenant_room_assignments']['Row']
+type Assignment = Database['public']['Tables']['tenant_assignments']['Row']
 
 interface CalendarEvent {
     id: string
@@ -42,9 +42,9 @@ export function CalendarWidget({ invoices, assignments }: CalendarWidgetProps) {
 
     // Get upcoming lease expirations
     const upcomingLeases: CalendarEvent[] = assignments
-        .filter(a => a.lease_end && a.is_active)
+        .filter(a => (a as any).lease_end && (a as any).is_active)
         .map(a => {
-            const endDate = new Date(a.lease_end!)
+            const endDate = new Date((a as any).lease_end!)
             const daysUntil = Math.ceil((endDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
             const roomName = (a as any).rooms?.name || 'Room'
             return {

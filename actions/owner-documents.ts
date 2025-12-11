@@ -2,9 +2,14 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { Database } from '@/types/supabase'
 
-type DocumentInsert = Database['public']['Tables']['documents']['Insert']
+// Local interface since documents table may not be in generated types
+interface DocumentInsert {
+  tenant_id: string
+  title: string
+  type: string
+  file_url: string
+}
 
 interface UserMetadata {
   role?: string

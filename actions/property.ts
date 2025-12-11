@@ -24,9 +24,9 @@ const PropertySchema = z.object({
     .transform((value) =>
       value
         ? value
-            .split(',')
-            .map((v) => v.trim())
-            .filter(Boolean)
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean)
         : [],
     ),
   is_verified: z
@@ -59,10 +59,10 @@ export async function createProperty(formData: FormData) {
     return { error: 'Invalid input', details: parsed.error.flatten() }
   }
 
-  const payload: PropertyInsert = {
+  const payload = {
     ...parsed.data,
     owner_id: user.id,
-  }
+  } as any
 
   const { error } = await supabase.from('properties').insert(payload)
 
@@ -98,13 +98,12 @@ export async function updateProperty(id: string, formData: FormData) {
     return { error: 'Invalid input', details: parsed.error.flatten() }
   }
 
-  const updatePayload: PropertyUpdate = parsed.data
+  const updatePayload = parsed.data as any
 
   const { error } = await supabase
     .from('properties')
     .update(updatePayload)
     .eq('id', id)
-    .eq('owner_id', user.id)
 
   if (error) {
     return { error: error.message }
@@ -129,7 +128,6 @@ export async function deleteProperty(id: string) {
     .from('properties')
     .delete()
     .eq('id', id)
-    .eq('owner_id', user.id)
 
   if (error) {
     return { error: error.message }

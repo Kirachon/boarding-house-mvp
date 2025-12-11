@@ -18,7 +18,11 @@ import { toast } from 'sonner'
 import { Database } from '@/types/supabase'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-type Profile = Database['public']['Tables']['profiles']['Row']
+// Local interface since profiles table may not exist in generated types
+interface Profile {
+  id: string
+  full_name: string | null
+}
 
 interface LeaseUploadDialogProps {
   tenants: Profile[]

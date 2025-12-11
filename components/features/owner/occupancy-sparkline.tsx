@@ -10,7 +10,7 @@ interface OccupancySparklineProps {
 
 export function OccupancySparkline({ rooms }: OccupancySparklineProps) {
     const total = rooms.length
-    const occupied = rooms.filter(r => r.occupancy === 'occupied').length
+    const occupied = rooms.filter(r => r.occupancy_status === 'occupied').length
     const occupancyRate = total > 0 ? Math.round((occupied / total) * 100) : 0
 
     // Generate simple sparkline bars (simulating last 7 periods)
@@ -24,8 +24,8 @@ export function OccupancySparkline({ rooms }: OccupancySparklineProps) {
                 <div
                     key={i}
                     className={`w-2 rounded-t transition-all ${i === sparkData.length - 1
-                            ? 'bg-primary'
-                            : 'bg-primary/30'
+                        ? 'bg-primary'
+                        : 'bg-primary/30'
                         }`}
                     style={{ height: `${(val / maxVal) * 100}%` }}
                 />

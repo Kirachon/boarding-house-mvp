@@ -17,14 +17,16 @@ import { removeTenant } from '@/actions/tenant'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 
-type Assignment = Database['public']['Tables']['tenant_room_assignments']['Row'] & {
-    profiles: Database['public']['Tables']['profiles']['Row'] | null
+// Use 'any' for properties that exist at runtime but not in generated types
+type Assignment = Database['public']['Tables']['tenant_assignments']['Row'] & {
+    profiles?: { id: string; full_name: string | null } | null
     rooms: Database['public']['Tables']['rooms']['Row'] | null
     room_handover_checklists?: {
         type: string
         is_completed: boolean
         completed_at: string | null
     }[]
+    created_at?: string | null
 }
 
 interface TenantListProps {
@@ -116,7 +118,7 @@ export function TenantList({ assignments }: TenantListProps) {
                                         })()}
                                     </TableCell>
                                     <TableCell className="text-sm text-muted-foreground">
-                                        {new Date(assignment.created_at).toLocaleDateString()}
+                                        {new Date((assignment as any).created_at ?? assignment.assign_date ?? '').toLocaleDateString()}
                                     </TableCell>
                                     <TableCell className="text-right pr-6">
                                         <Button
@@ -135,6 +137,6 @@ export function TenantList({ assignments }: TenantListProps) {
                     </TableBody>
                 </Table>
             </CardContent>
-        </Card>
+        </Card >
     )
 }

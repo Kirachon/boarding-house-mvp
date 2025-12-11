@@ -17,8 +17,15 @@ import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { PaymentVerificationDialog } from './payment-verification-dialog'
 
+// Local interface since profiles table may not exist in generated types
+interface Profile {
+    id: string
+    full_name: string | null
+}
+
 type Invoice = Database['public']['Tables']['invoices']['Row'] & {
-    profiles: Database['public']['Tables']['profiles']['Row'] | null
+    profiles: Profile | null
+    description?: string
 }
 
 interface InvoiceListProps {
@@ -87,87 +94,87 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                             <span className="text-xs text-muted-foreground">{data.length}</span>
                         </div>
                         <Table>
-                    <TableHeader>
-                        <TableRow className="hover:bg-transparent border-b border-border/50">
-                            <TableHead className="w-[200px] pl-6">Tenant</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Due Date</TableHead>
-                            <TableHead>Amount</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right pr-6">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {data.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground text-xs">
-                                    <div className="flex flex-col items-center justify-center gap-2">
-                                        <p>No records in this view.</p>
-                                        {idx === sections.length - 1 && (
-                                            <p className="text-xs text-muted-foreground/60">
-                                                Generate a new invoice to get started.
-                                            </p>
-                                        )}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            data.map((invoice) => (
-                                <TableRow key={invoice.id} className="group hover:bg-muted/30 border-b border-border/40 transition-colors">
-                                    <TableCell className="font-medium pl-6">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-xs font-bold text-indigo-700">
-                                                {invoice.profiles?.full_name?.charAt(0) || '?'}
-                                            </div>
-                                            {invoice.profiles?.full_name || 'Unknown'}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground">{invoice.description}</TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">
-                                        {new Date(invoice.due_date).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell className="font-mono font-semibold text-slate-700">
-                                        ${invoice.amount.toFixed(2)}
-                                    </TableCell>
-                                    <TableCell>
-                                        {getStatusBadge(invoice.status)}
-                                    </TableCell>
-                                    <TableCell className="text-right pr-6">
-                                        {invoice.status === 'pending_verification' ? (
-                                            <PaymentVerificationDialog
-                                                invoice={invoice}
-                                                trigger={
-                                                    <Button size="sm" className="gradient-blue text-white shadow-lg shadow-blue-500/20">
-                                                        Review Proof
-                                                    </Button>
-                                                }
-                                            />
-                                        ) : (
-                                            <>
-                                                {invoice.status !== 'paid' && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-                                                        onClick={() => handleStatusChange(invoice.id, 'paid')}
-                                                    >
-                                                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                                                        Mark Paid
-                                                    </Button>
-                                                )}
-                                                {invoice.status === 'paid' && (
-                                                    <span className="text-xs text-muted-foreground italic px-3 py-2">
-                                                        Received
-                                                    </span>
-                                                )}
-                                            </>
-                                        )}
-                                    </TableCell>
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent border-b border-border/50">
+                                    <TableHead className="w-[200px] pl-6">Tenant</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead>Due Date</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right pr-6">Actions</TableHead>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="h-24 text-center text-muted-foreground text-xs">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <p>No records in this view.</p>
+                                                {idx === sections.length - 1 && (
+                                                    <p className="text-xs text-muted-foreground/60">
+                                                        Generate a new invoice to get started.
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    data.map((invoice) => (
+                                        <TableRow key={invoice.id} className="group hover:bg-muted/30 border-b border-border/40 transition-colors">
+                                            <TableCell className="font-medium pl-6">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-xs font-bold text-indigo-700">
+                                                        {invoice.profiles?.full_name?.charAt(0) || '?'}
+                                                    </div>
+                                                    {invoice.profiles?.full_name || 'Unknown'}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">{invoice.description}</TableCell>
+                                            <TableCell className="text-muted-foreground text-sm">
+                                                {new Date(invoice.due_date).toLocaleDateString()}
+                                            </TableCell>
+                                            <TableCell className="font-mono font-semibold text-slate-700">
+                                                ${invoice.amount.toFixed(2)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {getStatusBadge(invoice.status)}
+                                            </TableCell>
+                                            <TableCell className="text-right pr-6">
+                                                {invoice.status === 'pending_verification' ? (
+                                                    <PaymentVerificationDialog
+                                                        invoice={invoice}
+                                                        trigger={
+                                                            <Button size="sm" className="gradient-blue text-white shadow-lg shadow-blue-500/20">
+                                                                Review Proof
+                                                            </Button>
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        {invoice.status !== 'paid' && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="opacity-0 group-hover:opacity-100 transition-opacity text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                                                                onClick={() => handleStatusChange(invoice.id, 'paid')}
+                                                            >
+                                                                <CheckCircle2 className="w-4 h-4 mr-2" />
+                                                                Mark Paid
+                                                            </Button>
+                                                        )}
+                                                        {invoice.status === 'paid' && (
+                                                            <span className="text-xs text-muted-foreground italic px-3 py-2">
+                                                                Received
+                                                            </span>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
                 ))}
             </CardContent>

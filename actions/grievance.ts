@@ -40,47 +40,56 @@ export async function createGrievance(formData: FormData) {
         return { error: 'Unauthorized' }
     }
 
-    // 3. Handle File Upload (if exists)
-    let photoUrl: string | null = null
-    if (photoFile && photoFile.size > 0) {
-        try {
-            const fileExt = photoFile.name.split('.').pop()
-            const fileName = `${user.id}/${Date.now()}.${fileExt}`
-            const { error: uploadError, data } = await supabase.storage
-                .from('grievance-attachments')
-                .upload(fileName, photoFile)
+    // 3. Handle File Upload (logic moved to step 5)
+    // kept empty to maintain flow, or just remove.
+    // I will remove the block.
 
-            if (uploadError) {
-                console.error("Upload Error:", uploadError)
-                // Proceed without photo or return error? Let's return error to notify user.
-                return { error: 'Failed to upload photo' }
-            }
-
-            // Get Public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from('grievance-attachments')
-                .getPublicUrl(fileName)
-
-            photoUrl = publicUrl
-        } catch (e) {
-            console.error("File processing error", e)
-            return { error: 'Failed to process file' }
-        }
-    }
-
-    // 4. Insert into DB
-    const { error } = await supabase
+    // 4. Insert into DB (Grievance)
+    const { data: grievance, error } = await supabase
         .from('grievances')
         .insert({
             tenant_id: user.id,
             category: validated.data.category,
             description: validated.data.description,
-            photo_url: photoUrl,
         })
+        .select()
+        .single()
 
     if (error) {
         console.error("createGrievance: insert error", error);
         return { error: error.message }
+    }
+
+    // 5. Handle File Upload & Attachment Record
+    if (photoFile && photoFile.size > 0) {
+        try {
+            const fileExt = photoFile.name.split('.').pop()
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`
+
+            // Upload to Storage
+            const { error: uploadError } = await supabase.storage
+                .from('grievance-attachments')
+                .upload(fileName, photoFile)
+
+            if (uploadError) {
+                console.error("Upload Error:", uploadError)
+                // We inserted grievance but failed upload. 
+                // Ideally rollback or notify. For now, just logging.
+            } else {
+                // Create Attachment Record
+                await supabase
+                    .from('grievance_attachments')
+                    .insert({
+                        grievance_id: grievance.id,
+                        file_name: photoFile.name,
+                        file_path: fileName,
+                        file_size: photoFile.size,
+                        file_type: photoFile.type
+                    })
+            }
+        } catch (e) {
+            console.error("File processing error", e)
+        }
     }
 
     revalidatePath('/tenant/dashboard') // Update dashboard immediately

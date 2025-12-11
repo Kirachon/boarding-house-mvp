@@ -2,9 +2,16 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { Database } from '@/types/supabase'
 
-type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
+// Local interface since notifications table may not be in generated types
+interface NotificationInsert {
+  user_id: string | null
+  title: string
+  message: string
+  type?: string
+  link?: string
+  is_read?: boolean
+}
 
 export async function createInquiry(propertyId: string, formData: FormData) {
   const supabase = await createClient()

@@ -105,7 +105,7 @@ export function RoomDialog({ mode, room, open, onOpenChange, trigger }: RoomDial
                                 name="capacity"
                                 type="number"
                                 min="1"
-                                defaultValue={room?.capacity}
+                                defaultValue={(room as any)?.capacity}
                                 required
                                 className="h-10"
                             />

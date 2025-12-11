@@ -25,7 +25,11 @@ import { toast } from 'sonner'
 import { Receipt, FileText } from 'lucide-react'
 import { Database } from '@/types/supabase'
 
-type Profile = Database['public']['Tables']['profiles']['Row']
+// Local interface since profiles table may not exist in generated types
+interface Profile {
+    id: string
+    full_name: string | null
+}
 
 interface InvoiceDialogProps {
     tenants: Profile[]

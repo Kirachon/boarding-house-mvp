@@ -20,7 +20,7 @@ export default async function TenantRoomPage() {
   }
 
   const { data: activeAssignments } = await supabase
-    .from('tenant_room_assignments')
+    .from('tenant_assignments')
     .select(
       `
       id,
@@ -38,11 +38,11 @@ export default async function TenantRoomPage() {
     .order('start_date', { ascending: false })
     .limit(1)
 
-  type AssignmentRow = Database['public']['Tables']['tenant_room_assignments']['Row'] & {
+  type AssignmentRow = Database['public']['Tables']['tenant_assignments']['Row'] & {
     room?:
-      | Database['public']['Tables']['rooms']['Row']
-      | Database['public']['Tables']['rooms']['Row'][]
-      | null
+    | Database['public']['Tables']['rooms']['Row']
+    | Database['public']['Tables']['rooms']['Row'][]
+    | null
   }
 
   const activeAssignment = (activeAssignments?.[0] ?? null) as AssignmentRow | null
@@ -84,8 +84,8 @@ export default async function TenantRoomPage() {
           roomName={roomName}
           occupancy={
             Array.isArray(activeAssignment?.room)
-              ? activeAssignment?.room[0]?.occupancy
-              : activeAssignment?.room?.occupancy
+              ? (activeAssignment?.room[0] as any)?.occupancy ?? (activeAssignment?.room[0] as any)?.occupancy_status
+              : (activeAssignment?.room as any)?.occupancy ?? (activeAssignment?.room as any)?.occupancy_status
           }
           items={inventoryItems}
         />

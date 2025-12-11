@@ -38,7 +38,7 @@ export function TenantAnnouncementList({ announcements }: TenantAnnouncementList
                 {a.content}
               </p>
               <p className="text-[11px] text-muted-foreground/70">
-                {new Date(a.created_at).toLocaleDateString()}
+                {new Date(a.created_at ?? '').toLocaleDateString()}
               </p>
             </div>
           ))

@@ -13,7 +13,14 @@ import { Database } from '@/types/supabase'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
-type Notification = Database['public']['Tables']['notifications']['Row']
+interface Notification {
+    id: string
+    title: string
+    message: string
+    is_read: boolean
+    created_at: string | null
+    user_id: string
+}
 
 export function NotificationBell() {
     const [notifications, setNotifications] = useState<Notification[]>([])
@@ -137,7 +144,7 @@ export function NotificationBell() {
                                         {notification.message}
                                     </p>
                                     <span className="text-[10px] text-muted-foreground mt-2 block">
-                                        {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {new Date(notification.created_at ?? '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
                             ))}

@@ -10,10 +10,10 @@ interface RoomAvailabilityPanelProps {
 
 export function RoomAvailabilityPanel({ rooms }: RoomAvailabilityPanelProps) {
   const totalRooms = rooms.length
-  const occupied = rooms.filter((room) => room.occupancy === "occupied").length
-  const vacant = rooms.filter((room) => room.occupancy === "vacant").length
+  const occupied = rooms.filter((room) => room.occupancy_status === "occupied").length
+  const vacant = rooms.filter((room) => room.occupancy_status === "vacant").length
   const maintenance = rooms.filter(
-    (room) => room.occupancy === "maintenance"
+    (room) => room.occupancy_status === "maintenance"
   ).length
 
   const percentage = (count: number) =>

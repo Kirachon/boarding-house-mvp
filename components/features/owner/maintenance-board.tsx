@@ -12,7 +12,11 @@ import { Loader2, ClipboardList, Wrench } from 'lucide-react'
 
 type Grievance = Database['public']['Tables']['grievances']['Row']
 type Room = Database['public']['Tables']['rooms']['Row']
-type Vendor = Database['public']['Tables']['vendors']['Row']
+// Local interface since vendors table may not exist in generated types
+interface Vendor {
+  id: string
+  name: string
+}
 type WorkOrderStatus = Database['public']['Enums']['work_order_status']
 
 type WorkOrder = Database['public']['Tables']['work_orders']['Row'] & {
@@ -109,52 +113,52 @@ export function MaintenanceBoard({ grievances, workOrders, vendors, rooms }: Mai
             </p>
           ) : (
             maintenanceTickets.map((g) => (
-                <div
-                  key={g.id}
-                  className="flex flex-col gap-2 rounded-md border bg-card/60 px-3 py-2.5 text-sm"
-                >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="font-medium line-clamp-2">{g.description}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">Room</span>
-                      <Select
-                        value={selectedRooms[g.id] ?? 'none'}
-                        onValueChange={(val) =>
-                          setSelectedRooms((prev) => ({ ...prev, [g.id]: val }))
-                        }
-                        disabled={isPending}
-                      >
-                        <SelectTrigger className="h-8 w-32 text-xs">
-                          <SelectValue placeholder="Unassigned" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Unassigned</SelectItem>
-                          {rooms.map((room) => (
-                            <SelectItem key={room.id} value={room.id}>
-                              {room.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="shrink-0"
-                        disabled={isPending}
-                        onClick={() => handleCreateWorkOrder(g.id)}
-                      >
-                        {isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          'Create'
-                        )}
-                      </Button>
-                    </div>
+              <div
+                key={g.id}
+                className="flex flex-col gap-2 rounded-md border bg-card/60 px-3 py-2.5 text-sm"
+              >
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="font-medium line-clamp-2">{g.description}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Room</span>
+                    <Select
+                      value={selectedRooms[g.id] ?? 'none'}
+                      onValueChange={(val) =>
+                        setSelectedRooms((prev) => ({ ...prev, [g.id]: val }))
+                      }
+                      disabled={isPending}
+                    >
+                      <SelectTrigger className="h-8 w-32 text-xs">
+                        <SelectValue placeholder="Unassigned" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Unassigned</SelectItem>
+                        {rooms.map((room) => (
+                          <SelectItem key={room.id} value={room.id}>
+                            {room.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="shrink-0"
+                      disabled={isPending}
+                      onClick={() => handleCreateWorkOrder(g.id)}
+                    >
+                      {isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Create'
+                      )}
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Reported on {new Date(g.created_at).toLocaleDateString()}
-                  </p>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Reported on {new Date(g.created_at ?? '').toLocaleDateString()}
+                </p>
+              </div>
             ))
           )}
         </CardContent>
@@ -230,7 +234,7 @@ export function MaintenanceBoard({ grievances, workOrders, vendors, rooms }: Mai
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Vendor</span>
                     <Select
-                      defaultValue={wo.vendor_id ?? 'none'}
+                      defaultValue={(wo as any).vendor_id ?? 'none'}
                       onValueChange={(val) =>
                         handleVendorChange(wo.id, val as string | 'none')
                       }

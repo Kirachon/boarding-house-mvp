@@ -87,7 +87,7 @@ export function OwnerGrievanceList({ initialGrievances }: OwnerGrievanceListProp
                         </div>
                         <p className="text-sm text-muted-foreground">{grievance.description}</p>
                         <p className="mt-2 text-xs text-muted-foreground">
-                            Reported: {new Date(grievance.created_at).toLocaleDateString()}
+                            Reported: {new Date(grievance.created_at ?? '').toLocaleDateString()}
                         </p>
                     </div>
                     <div className="w-full md:w-auto min-w-[140px]">

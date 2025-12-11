@@ -28,10 +28,10 @@ export function TenantRoomInventory({ roomName, occupancy, items }: TenantRoomIn
     occupancy === 'occupied'
       ? 'Occupied'
       : occupancy === 'vacant'
-      ? 'Vacant'
-      : occupancy === 'maintenance'
-      ? 'Under maintenance'
-      : undefined
+        ? 'Vacant'
+        : occupancy === 'maintenance'
+          ? 'Under maintenance'
+          : undefined
 
   return (
     <Card>
@@ -72,7 +72,7 @@ export function TenantRoomInventory({ roomName, occupancy, items }: TenantRoomIn
                 <div>
                   <p className="font-medium">{item.name}</p>
                   <p className="text-[11px] text-muted-foreground">
-                    Last checked {new Date(item.last_checked).toLocaleDateString()}
+                    Last checked {new Date((item as any).last_checked ?? item.created_at ?? '').toLocaleDateString()}
                   </p>
                 </div>
                 <Badge variant={conditionVariant[item.condition]}>

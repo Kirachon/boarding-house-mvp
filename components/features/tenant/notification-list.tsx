@@ -9,7 +9,14 @@ import { Database } from '@/types/supabase'
 import { Bell } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-type Notification = Database['public']['Tables']['notifications']['Row']
+// Local interface since notifications table may not exist in generated types
+interface Notification {
+  id: string
+  title: string
+  message: string
+  is_read: boolean
+  created_at: string
+}
 
 export function TenantNotificationList() {
   const supabase = createClient()

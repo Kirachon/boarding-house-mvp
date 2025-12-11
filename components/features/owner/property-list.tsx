@@ -57,13 +57,13 @@ export function PropertyList({ properties }: PropertyListProps) {
               <div className="space-y-1">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                   {property.name}
-                  {property.is_verified && (
+                  {(property as any).is_verified && (
                     <Badge className="bg-blue-600 text-white hover:bg-blue-700">Verified</Badge>
                   )}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
-                  {property.address}, {property.city}
+                  {property.address}, {(property as any).city}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -88,15 +88,15 @@ export function PropertyList({ properties }: PropertyListProps) {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex flex-wrap gap-2">
-                {Array.isArray(property.amenities) &&
-                  property.amenities.map((amenity) => (
+                {Array.isArray((property as any).amenities) &&
+                  (property as any).amenities.map((amenity: string) => (
                     <Badge key={amenity} variant="outline" className="text-xs">
                       {amenity}
                     </Badge>
                   ))}
               </div>
               <p className="text-xs text-muted-foreground line-clamp-3">
-                {property.description || 'No description provided.'}
+                {(property as any).description || 'No description provided.'}
               </p>
               <div className="flex items-center justify-between pt-2 border-t mt-2 text-xs">
                 <span className="text-muted-foreground">Public verification link</span>

@@ -53,7 +53,7 @@ export function RoomHealthGrid({ rooms }: RoomHealthGridProps) {
                     healthColor = 'bg-amber-500'
                 }
 
-                const occupancy = occupancyConfig[room.occupancy] || { variant: "outline" as const, label: room.occupancy }
+                const occupancy = occupancyConfig[room.occupancy_status] || { variant: "outline" as const, label: room.occupancy_status }
 
                 return (
                     <Card
@@ -66,13 +66,13 @@ export function RoomHealthGrid({ rooms }: RoomHealthGridProps) {
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${room.occupancy === 'occupied'
-                                            ? 'gradient-blue'
-                                            : room.occupancy === 'maintenance'
-                                                ? 'bg-red-500'
-                                                : 'bg-slate-200'
+                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${room.occupancy_status === 'occupied'
+                                        ? 'gradient-blue'
+                                        : room.occupancy_status === 'maintenance'
+                                            ? 'bg-red-500'
+                                            : 'bg-slate-200'
                                         }`}>
-                                        <Home className={`h-5 w-5 ${room.occupancy === 'vacant' ? 'text-slate-500' : 'text-white'}`} />
+                                        <Home className={`h-5 w-5 ${room.occupancy_status === 'vacant' ? 'text-slate-500' : 'text-white'}`} />
                                     </div>
                                     <div>
                                         <CardTitle className="text-base font-semibold">{room.name}</CardTitle>
@@ -116,9 +116,9 @@ export function RoomHealthGrid({ rooms }: RoomHealthGridProps) {
                                         >
                                             <span className="text-foreground truncate">{item.name}</span>
                                             <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${item.condition === 'good' ? 'bg-emerald-100 text-emerald-700' :
-                                                    item.condition === 'fair' ? 'bg-amber-100 text-amber-700' :
-                                                        item.condition === 'poor' ? 'bg-orange-100 text-orange-700' :
-                                                            'bg-red-100 text-red-700'
+                                                item.condition === 'fair' ? 'bg-amber-100 text-amber-700' :
+                                                    item.condition === 'poor' ? 'bg-orange-100 text-orange-700' :
+                                                        'bg-red-100 text-red-700'
                                                 }`}>
                                                 {item.condition}
                                             </span>

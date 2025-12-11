@@ -53,8 +53,9 @@ export default async function TenantIssuesPage() {
   const typedWorkOrders: WorkOrder[] = (workOrders || []) as unknown as WorkOrder[]
 
   typedWorkOrders.forEach((w) => {
-    if (w.grievance_id) {
-      workOrderStatusesByGrievance[w.grievance_id] = w.status
+    const gId = (w as any).grievance_id
+    if (gId) {
+      workOrderStatusesByGrievance[gId] = w.status
     }
   })
 

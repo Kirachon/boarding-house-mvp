@@ -15,7 +15,14 @@ import { deleteExpense } from '@/actions/expense'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 
-type Expense = Database['public']['Tables']['expenses']['Row']
+// Local interface since expenses table may not exist in generated types
+interface Expense {
+  id: string
+  expense_date: string
+  category: string
+  description: string | null
+  amount: number
+}
 
 interface ExpenseListProps {
   expenses: Expense[]

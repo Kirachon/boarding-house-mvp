@@ -39,14 +39,14 @@ export default async function OwnerDashboardPage() {
     ).length
 
     // Transform assignments for type safety
-    type AssignmentRow = Database['public']['Tables']['tenant_room_assignments']['Row'] & {
+    type AssignmentRow = Database['public']['Tables']['tenant_assignments']['Row'] & {
         tenant?: { full_name: string | null } | { full_name: string | null }[] | null
         room?: { name: string | null } | { name: string | null }[] | null
         rooms?: { name: string | null } | null
     }
 
     const transformedAssignments: AssignmentRow[] = assignments.map((item) => {
-        const raw = item as AssignmentRow
+        const raw = item as unknown as AssignmentRow
         const tenant = Array.isArray(raw.tenant) ? raw.tenant[0] : raw.tenant
         const room = Array.isArray(raw.room) ? raw.room[0] : raw.room
 

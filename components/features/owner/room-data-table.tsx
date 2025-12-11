@@ -79,7 +79,7 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
                                 <TableRow key={room.id} className="group hover:bg-muted/30 border-b border-border/40 transition-colors">
                                     <TableCell className="font-medium pl-6">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${room.occupancy === 'occupied' ? 'gradient-blue text-white' : 'bg-slate-100 text-slate-500'
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${room.occupancy_status === 'occupied' ? 'gradient-blue text-white' : 'bg-slate-100 text-slate-500'
                                                 }`}>
                                                 <Home className="w-4 h-4" />
                                             </div>
@@ -90,12 +90,12 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        {getOccupancyBadge(room.occupancy)}
+                                        {getOccupancyBadge(room.occupancy_status)}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                                             <Users className="w-4 h-4" />
-                                            {room.capacity} Pax
+                                            {(room as any).capacity ?? 1} Pax
                                         </div>
                                     </TableCell>
                                     <TableCell>

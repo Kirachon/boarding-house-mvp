@@ -94,7 +94,7 @@ export function PropertyDialog({ mode, property, trigger }: PropertyDialogProps)
             <Input
               id="city"
               name="city"
-              defaultValue={property?.city ?? ''}
+              defaultValue={(property as any)?.city ?? ''}
               placeholder="City / locality"
               required
             />
@@ -104,7 +104,7 @@ export function PropertyDialog({ mode, property, trigger }: PropertyDialogProps)
             <Input
               id="amenities"
               name="amenities"
-              defaultValue={Array.isArray(property?.amenities) ? property?.amenities.join(', ') : ''}
+              defaultValue={Array.isArray((property as any)?.amenities) ? (property as any)?.amenities.join(', ') : ''}
               placeholder="Comma-separated (WiFi, Laundry, Parking)"
             />
           </div>
@@ -113,7 +113,7 @@ export function PropertyDialog({ mode, property, trigger }: PropertyDialogProps)
             <Textarea
               id="description"
               name="description"
-              defaultValue={property?.description ?? ''}
+              defaultValue={(property as any)?.description ?? ''}
               placeholder="Short description that helps guests understand this property."
               className="min-h-[100px]"
             />
@@ -122,7 +122,7 @@ export function PropertyDialog({ mode, property, trigger }: PropertyDialogProps)
             <Checkbox
               id="is_verified"
               name="is_verified"
-              defaultChecked={Boolean(property?.is_verified)}
+              defaultChecked={Boolean((property as any)?.is_verified)}
             />
             <Label htmlFor="is_verified" className="text-sm font-normal">
               Mark as verified partner

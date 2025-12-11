@@ -96,7 +96,7 @@ export function TenantInvoiceList({ invoices }: TenantInvoiceListProps) {
                     filteredInvoices.map(invoice => (
                         <div key={invoice.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/50 gap-4">
                             <div className="space-y-1">
-                                <p className="font-semibold text-foreground">{invoice.description}</p>
+                                <p className="font-semibold text-foreground">{(invoice as any).description ?? `Invoice #${invoice.id.slice(0, 8)}`}</p>
                                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                                     <Clock className="w-3 h-3" /> Due: {new Date(invoice.due_date).toLocaleDateString()}
                                 </p>
