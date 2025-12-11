@@ -193,8 +193,8 @@ export function MaintenanceBoard({ grievances, workOrders, vendors, rooms }: Mai
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium line-clamp-1">{wo.title}</p>
-                      <Badge variant={statusVariant[wo.status]}>
-                        {statusLabel[wo.status]}
+                      <Badge variant={statusVariant[wo.status ?? 'open']}>
+                        {statusLabel[wo.status ?? 'open']}
                       </Badge>
                     </div>
                     {wo.room && (
@@ -213,7 +213,7 @@ export function MaintenanceBoard({ grievances, workOrders, vendors, rooms }: Mai
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Status</span>
                     <Select
-                      defaultValue={wo.status}
+                      defaultValue={wo.status ?? 'open'}
                       onValueChange={(val) =>
                         handleStatusChange(wo.id, val as WorkOrderStatus)
                       }

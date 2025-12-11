@@ -87,13 +87,15 @@ export function RoomDialog({ mode, room, open, onOpenChange, trigger }: RoomDial
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="price">Price (Monthly)</Label>
+                            <Label htmlFor="price" className="text-right">
+                                Price/Month
+                            </Label>
                             <Input
                                 id="price"
-                                name="price"
+                                name="price_per_month"
                                 type="number"
                                 step="0.01"
-                                defaultValue={room?.price}
+                                defaultValue={room?.price_per_month}
                                 required
                                 className="h-10 font-mono"
                             />

@@ -114,7 +114,7 @@ export function TenantDialog({ rooms }: TenantDialogProps) {
                                     ) : (
                                         vacantRooms.map(room => (
                                             <SelectItem key={room.id} value={room.id}>
-                                                {room.name} (${room.price})
+                                                {room.name} (${room.price_per_month})
                                             </SelectItem>
                                         ))
                                     )}

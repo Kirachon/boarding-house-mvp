@@ -55,7 +55,7 @@ export default async function TenantIssuesPage() {
   typedWorkOrders.forEach((w) => {
     const gId = (w as any).grievance_id
     if (gId) {
-      workOrderStatusesByGrievance[gId] = w.status
+      workOrderStatusesByGrievance[gId] = w.status ?? 'open'
     }
   })
 

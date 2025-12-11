@@ -90,7 +90,7 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        {getOccupancyBadge(room.occupancy_status)}
+                                        {getOccupancyBadge(room.occupancy_status ?? 'vacant')}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -99,7 +99,7 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="font-mono font-medium text-slate-700">${room.price}</span>
+                                        <span className="font-mono font-medium text-slate-700">${room.price_per_month}</span>
                                         <span className="text-xs text-muted-foreground ml-1">/mo</span>
                                     </TableCell>
                                     <TableCell className="text-right pr-6">

@@ -137,7 +137,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                                                 ${invoice.amount.toFixed(2)}
                                             </TableCell>
                                             <TableCell>
-                                                {getStatusBadge(invoice.status)}
+                                                {getStatusBadge(invoice.status ?? 'unpaid')}
                                             </TableCell>
                                             <TableCell className="text-right pr-6">
                                                 {invoice.status === 'pending_verification' ? (

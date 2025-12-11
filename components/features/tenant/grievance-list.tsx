@@ -72,8 +72,8 @@ export function GrievanceList({ initialGrievances, userId, workOrderStatusesByGr
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className="font-semibold capitalize text-foreground">{grievance.category}</span>
-                                    <Badge variant={statusColorMap[grievance.status] || "outline"}>
-                                        {grievance.status.replace('_', ' ')}
+                                    <Badge variant={statusColorMap[grievance.status ?? 'open'] || "outline"}>
+                                        {grievance.status?.replace('_', ' ') ?? 'Open'}
                                     </Badge>
                                 </div>
                                 <p className="text-sm text-muted-foreground line-clamp-2">{grievance.description}</p>

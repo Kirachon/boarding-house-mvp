@@ -90,8 +90,8 @@ export function WorkOrderList({ initialWorkOrders, tenantId }: WorkOrderListProp
           >
             <div className="flex items-center justify-between gap-2">
               <p className="font-medium line-clamp-1">{wo.title}</p>
-              <Badge variant={statusVariant[wo.status]}>
-                {statusLabel[wo.status]}
+              <Badge variant={statusVariant[wo.status ?? 'open']}>
+                {statusLabel[wo.status ?? 'open']}
               </Badge>
             </div>
             {roomName && (

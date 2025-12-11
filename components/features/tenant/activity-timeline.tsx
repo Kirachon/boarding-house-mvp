@@ -36,7 +36,7 @@ export function TenantActivityTimeline({
       title: 'Issue reported',
       description: g.description.slice(0, 60) + (g.description.length > 60 ? '…' : ''),
       date: g.created_at ?? '',
-      status: g.status,
+      status: g.status ?? undefined,
     })),
     ...workOrders.slice(0, 3).map((w) => ({
       id: w.id,
@@ -44,7 +44,7 @@ export function TenantActivityTimeline({
       title: 'Maintenance work order',
       description: w.title,
       date: (w as any).updated_at || w.created_at || '',
-      status: w.status,
+      status: w.status ?? undefined,
     })),
     ...invoices.slice(0, 3).map((i) => ({
       id: i.id,
@@ -52,7 +52,7 @@ export function TenantActivityTimeline({
       title: i.status === 'paid' ? 'Payment recorded' : 'Bill created',
       description: `${(i as any).description ?? 'Invoice'} – ₱${i.amount.toFixed(2)}`,
       date: (i as any).updated_at || i.created_at || '',
-      status: i.status,
+      status: i.status ?? undefined,
     })),
     ...announcements.slice(0, 2).map((a) => ({
       id: a.id,

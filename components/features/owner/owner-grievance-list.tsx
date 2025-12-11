@@ -81,8 +81,8 @@ export function OwnerGrievanceList({ initialGrievances }: OwnerGrievanceListProp
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold capitalize text-foreground">{grievance.category}</span>
-                            <Badge variant={statusColorMap[grievance.status] || "outline"}>
-                                {grievance.status.replace('_', ' ')}
+                            <Badge variant={statusColorMap[grievance.status ?? 'open'] || "outline"}>
+                                {grievance.status?.replace('_', ' ') ?? 'Open'}
                             </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">{grievance.description}</p>
@@ -92,7 +92,7 @@ export function OwnerGrievanceList({ initialGrievances }: OwnerGrievanceListProp
                     </div>
                     <div className="w-full md:w-auto min-w-[140px]">
                         <Select
-                            defaultValue={grievance.status}
+                            defaultValue={grievance.status ?? 'open'}
                             onValueChange={(val) => handleStatusChange(grievance.id, val as GrievanceStatus)}
                             disabled={isPending}
                         >

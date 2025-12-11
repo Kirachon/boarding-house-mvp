@@ -53,7 +53,7 @@ export function RoomHealthGrid({ rooms }: RoomHealthGridProps) {
                     healthColor = 'bg-amber-500'
                 }
 
-                const occupancy = occupancyConfig[room.occupancy_status] || { variant: "outline" as const, label: room.occupancy_status }
+                const occupancy = occupancyConfig[room.occupancy_status ?? 'vacant'] || { variant: "outline" as const, label: room.occupancy_status ?? 'Unknown' }
 
                 return (
                     <Card
@@ -76,7 +76,7 @@ export function RoomHealthGrid({ rooms }: RoomHealthGridProps) {
                                     </div>
                                     <div>
                                         <CardTitle className="text-base font-semibold">{room.name}</CardTitle>
-                                        <p className="text-xs text-muted-foreground">${room.price}/mo</p>
+                                        <p className="text-xs text-muted-foreground">${room.price_per_month}/mo</p>
                                     </div>
                                 </div>
                                 <Badge variant={occupancy.variant} className="text-[10px] font-medium">

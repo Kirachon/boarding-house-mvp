@@ -30,7 +30,7 @@ export function ActivityTimeline({ grievances, invoices, announcements }: Activi
             title: `${g.category} Issue Reported`,
             description: g.description.slice(0, 50) + (g.description.length > 50 ? '...' : ''),
             date: g.created_at ?? '',
-            status: g.status
+            status: g.status ?? undefined
         })),
         ...invoices.slice(0, 3).map(i => ({
             id: i.id,
@@ -38,7 +38,7 @@ export function ActivityTimeline({ grievances, invoices, announcements }: Activi
             title: i.status === 'paid' ? 'Payment Received' : 'Invoice Created',
             description: `$${i.amount.toFixed(2)} - ${(i as any).description ?? 'Invoice'}`,
             date: (i as any).updated_at || i.created_at || '',
-            status: i.status
+            status: i.status ?? undefined,
         })),
         ...announcements.slice(0, 2).map(a => ({
             id: a.id,
