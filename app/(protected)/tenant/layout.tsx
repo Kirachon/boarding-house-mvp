@@ -11,6 +11,7 @@ import {
   Bell,
 } from 'lucide-react'
 import { MobileNav } from '@/components/shared/mobile-nav'
+import { ChatWidget } from '@/components/features/shared/chat-widget'
 
 const tenantNavItems: DashboardNavItem[] = [
   { label: 'Home', href: '/tenant/dashboard', icon: <Home className="h-4 w-4" /> },
@@ -41,6 +42,7 @@ export default async function TenantLayout({ children }: { children: ReactNode }
       <DashboardSidebar items={tenantNavItems} />
       <main className="flex-1">{children}</main>
       <MobileNav />
+      <ChatWidget currentUserId={user.id} />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { ChatWidget } from '@/components/features/shared/chat-widget'
 import { DashboardSidebar, DashboardNavItem } from '@/components/shared/dashboard-sidebar'
 import {
   LayoutDashboard,
@@ -44,7 +45,7 @@ export default async function OwnerLayout({ children }: { children: ReactNode })
     <div className="min-h-screen flex bg-background relative">
       <DashboardSidebar items={ownerNavItems} />
       <main className="flex-1">{children}</main>
-      {/* <ChatWidget currentUserId={user.id} />  -- Commented out until we have a proper use case/tenant selection context, but the component is ready */}
+      <ChatWidget currentUserId={user.id} />
     </div>
   )
 }
