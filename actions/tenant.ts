@@ -120,7 +120,24 @@ export async function removeTenant(assignmentId: string, roomId: string) {
     // For now, assume 1 room = vacant if this tenant leaves.
     await supabase.from('rooms').update({ occupancy: 'vacant' }).eq('id', roomId)
 
-    revalidatePath('/owner/tenants')
     revalidatePath('/owner/rooms')
+    return { success: true }
+}
+
+export async function renewLease(assignmentId: string, newEndDate: string) {
+    const supabase = await createClient()
+
+    // Verify Owner
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user || user.user_metadata.role !== 'owner') return { error: 'Unauthorized' }
+
+    // Update assignment
+    const { error } = await supabase.from('tenant_room_assignments')
+        .update({ end_date: newEndDate })
+        .eq('id', assignmentId)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/owner/tenants')
     return { success: true }
 }
