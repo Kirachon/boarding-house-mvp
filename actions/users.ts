@@ -47,7 +47,12 @@ export async function getAvailableUsersForChat(): Promise<{ data?: ChatUser[], e
             return { error: 'Failed to fetch users' }
         }
 
-        return { data: users as ChatUser[] }
+        return {
+            data: (users as ChatUser[]).map(u => ({
+                ...u,
+                full_name: u.full_name || (u.role === 'owner' ? 'Landlord' : 'Unknown User')
+            }))
+        }
     } catch (error) {
         console.error('Unexpected error:', error)
         return { error: 'An unexpected error occurred' }

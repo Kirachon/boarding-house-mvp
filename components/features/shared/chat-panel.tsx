@@ -242,7 +242,12 @@ export function ChatPanel({ currentUserId, channel, onClose, onBack }: ChatPanel
                                                             : 'bg-muted rounded-bl-sm'
                                                     )}
                                                 >
-                                                    {msg.content}
+                                                    {!isMe && (
+                                                        <p className="text-[10px] font-bold opacity-70 mb-1">
+                                                            {msg.sender?.full_name || 'User'}
+                                                        </p>
+                                                    )}
+                                                    <p>{msg.content}</p>
                                                     {isMe && (
                                                         <div className="flex justify-end mt-1">
                                                             {msg.read_at ? (

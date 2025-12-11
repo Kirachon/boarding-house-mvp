@@ -126,7 +126,7 @@ export async function getChannels(): Promise<{ data?: ChatChannel[], error?: str
                 // Types might be unknown due to complex joins
                 otherUser = {
                     id: member.user_id,
-                    full_name: (member.user as any).full_name ?? 'Unknown', // Type assertion if needed
+                    full_name: (member.user as any).full_name || (ch.metadata?.other_user_role === 'owner' ? 'Landlord' : 'Unknown User'), // Type assertion if needed
                     avatar_url: (member.user as any).avatar_url ?? null
                 }
             }
