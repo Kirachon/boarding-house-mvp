@@ -19,7 +19,7 @@ BEGIN
 
   -- 1. Create the channel
   INSERT INTO public.chat_channels (type, name)
-  VALUES (p_type, p_name)
+  VALUES (p_type::channel_type, p_name)
   RETURNING id INTO v_channel_id;
 
   -- 2. Add current user as member
