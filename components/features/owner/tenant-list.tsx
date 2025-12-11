@@ -1,8 +1,9 @@
 'use client'
 
 import { RenewLeaseDialog } from './renew-lease-dialog'
+import { RecurringSettingsDialog } from './recurring-settings-dialog'
 import { useState } from 'react'
-import { CalendarPlus } from 'lucide-react'
+import { CalendarPlus, Repeat } from 'lucide-react'
 
 
 import {
@@ -36,6 +37,7 @@ type Assignment = Database['public']['Tables']['tenant_assignments']['Row'] & {
 
 interface TenantListProps {
     assignments: Assignment[]
+    mode?: 'active' | 'history'
 }
 
 
@@ -46,12 +48,26 @@ interface RenewDialogState {
     currentEndDate?: string | null
 }
 
-export function TenantList({ assignments }: TenantListProps) {
+interface RecurringDialogState {
+    isOpen: boolean
+    assignmentId: string
+    tenantName: string
+    suggestedAmount: number
+}
+
+export function TenantList({ assignments, mode = 'active' }: TenantListProps) {
     const [renewDialog, setRenewDialog] = useState<RenewDialogState>({
         isOpen: false,
         assignmentId: '',
         tenantName: '',
         currentEndDate: null
+    })
+
+    const [recurringDialog, setRecurringDialog] = useState<RecurringDialogState>({
+        isOpen: false,
+        assignmentId: '',
+        tenantName: '',
+        suggestedAmount: 0 // Default, will try to pull from room
     })
 
     const handleRemove = async (assignmentId: string, roomId: string) => {
@@ -67,15 +83,14 @@ export function TenantList({ assignments }: TenantListProps) {
             <Card className="card-premium overflow-hidden border-0 bg-white/50 backdrop-blur-sm">
                 <CardContent className="p-0">
                     <Table>
-                        {/* ... TableHeader remains the same ... */}
                         <TableHeader>
                             <TableRow className="hover:bg-transparent border-b border-border/50">
                                 <TableHead className="w-[300px] pl-6">Tenant</TableHead>
                                 <TableHead>Assigned Room</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead>Checklist</TableHead>
-                                <TableHead>Joined</TableHead>
-                                <TableHead className="text-right pr-6">Actions</TableHead>
+                                {mode === 'active' && <TableHead>Checklist</TableHead>}
+                                <TableHead>{mode === 'active' ? 'Joined' : 'Lease Period'}</TableHead>
+                                {mode === 'active' && <TableHead className="text-right pr-6">Actions</TableHead>}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -111,63 +126,98 @@ export function TenantList({ assignments }: TenantListProps) {
                                                 <div className="flex items-center gap-2 text-slate-700">
                                                     <Home className="w-4 h-4 text-slate-400" />
                                                     {assignment.rooms.name}
+                                                    <span className="text-xs text-slate-400 font-normal ml-1">
+                                                        (₱{(assignment.rooms as any).price?.toLocaleString() || 0})
+                                                    </span>
                                                 </div>
                                             )}
                                             {!assignment.rooms && <span className="text-muted-foreground italic">Unassigned</span>}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-none px-2 py-0.5">
-                                                Active Lease
-                                            </Badge>
+                                            {mode === 'active' ? (
+                                                <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-none px-2 py-0.5">
+                                                    Active Lease
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="text-muted-foreground border-slate-300">
+                                                    Past Tenant
+                                                </Badge>
+                                            )}
                                         </TableCell>
-                                        <TableCell>
-                                            {(() => {
-                                                const checklistArray = assignment.room_handover_checklists || []
-                                                const moveIn = checklistArray.find(c => c.type === 'move_in')
-                                                if (moveIn?.is_completed) {
+                                        {mode === 'active' && (
+                                            <TableCell>
+                                                {(() => {
+                                                    const checklistArray = assignment.room_handover_checklists || []
+                                                    const moveIn = checklistArray.find(c => c.type === 'move_in')
+                                                    if (moveIn?.is_completed) {
+                                                        return (
+                                                            <span className="text-xs text-emerald-700 bg-emerald-50 rounded-full px-2 py-0.5">
+                                                                Move-in confirmed
+                                                            </span>
+                                                        )
+                                                    }
                                                     return (
-                                                        <span className="text-xs text-emerald-700 bg-emerald-50 rounded-full px-2 py-0.5">
-                                                            Move-in confirmed
+                                                        <span className="text-xs text-amber-700 bg-amber-50 rounded-full px-2 py-0.5">
+                                                            Awaiting checklist
                                                         </span>
                                                     )
-                                                }
-                                                return (
-                                                    <span className="text-xs text-amber-700 bg-amber-50 rounded-full px-2 py-0.5">
-                                                        Awaiting checklist
-                                                    </span>
-                                                )
-                                            })()}
-                                        </TableCell>
+                                                })()}
+                                            </TableCell>
+                                        )}
                                         <TableCell className="text-sm text-muted-foreground">
-                                            {new Date((assignment as any).created_at ?? assignment.assign_date ?? '').toLocaleDateString()}
+                                            {mode === 'active' ? (
+                                                new Date((assignment as any).created_at ?? assignment.assign_date ?? '').toLocaleDateString()
+                                            ) : (
+                                                <div className="flex flex-col text-xs">
+                                                    <span>In: {new Date((assignment as any).created_at ?? assignment.assign_date ?? '').toLocaleDateString()}</span>
+                                                    <span>Out: {(assignment as any).end_date ? new Date((assignment as any).end_date).toLocaleDateString() : 'N/A'}</span>
+                                                </div>
+                                            )}
                                         </TableCell>
-                                        <TableCell className="text-right pr-6">
-                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                    onClick={() => setRenewDialog({
-                                                        isOpen: true,
-                                                        assignmentId: assignment.id,
-                                                        tenantName: assignment.profiles?.full_name || 'Unknown',
-                                                        currentEndDate: (assignment as any).end_date // Cast because types might be out of sync
-                                                    })}
-                                                >
-                                                    <CalendarPlus className="w-4 h-4 mr-2" />
-                                                    Renew
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                    onClick={() => assignment.rooms && handleRemove(assignment.id, assignment.rooms.id)}
-                                                >
-                                                    <LogOut className="w-4 h-4 mr-2" />
-                                                    End
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                                        {mode === 'active' && (
+                                            <TableCell className="text-right pr-6">
+                                                <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {/* Recurring Button */}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        title="Auto-Billing Settings"
+                                                        className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-8 w-8"
+                                                        onClick={() => setRecurringDialog({
+                                                            isOpen: true,
+                                                            assignmentId: assignment.id,
+                                                            tenantName: assignment.profiles?.full_name || 'Unknown',
+                                                            suggestedAmount: (assignment.rooms as any)?.price || 0
+                                                        })}
+                                                    >
+                                                        <Repeat className="w-4 h-4" />
+                                                    </Button>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 px-2"
+                                                        onClick={() => setRenewDialog({
+                                                            isOpen: true,
+                                                            assignmentId: assignment.id,
+                                                            tenantName: assignment.profiles?.full_name || 'Unknown',
+                                                            currentEndDate: (assignment as any).end_date
+                                                        })}
+                                                    >
+                                                        <CalendarPlus className="w-4 h-4 mr-1.5" />
+                                                        Renew
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8"
+                                                        onClick={() => assignment.rooms && handleRemove(assignment.id, assignment.rooms.id)}
+                                                    >
+                                                        <LogOut className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 ))
                             )}
@@ -182,6 +232,14 @@ export function TenantList({ assignments }: TenantListProps) {
                 assignmentId={renewDialog.assignmentId}
                 tenantName={renewDialog.tenantName}
                 currentEndDate={renewDialog.currentEndDate}
+            />
+
+            <RecurringSettingsDialog
+                isOpen={recurringDialog.isOpen}
+                onOpenChange={(open) => setRecurringDialog(prev => ({ ...prev, isOpen: open }))}
+                assignmentId={recurringDialog.assignmentId}
+                tenantName={recurringDialog.tenantName}
+                suggestedAmount={recurringDialog.suggestedAmount}
             />
         </>
     )

@@ -1,0 +1,30 @@
+
+> temp_app@0.1.0 build
+> next build
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./app/(protected)/owner/tenants/page.tsx:11:1
+Module not found: Can't resolve '@/components/ui/tabs'
+   9 | import { TenantDialog } from '@/components/features/owner/tenant-dialog'
+  10 | import { DashboardShell } from '@/components/shared/dashboard-shell'
+> 11 | import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  12 |
+  13 | // Fix: Page props type
+  14 | type PageProps = {
+
+Import map: aliased to relative './components/ui/tabs' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./app/(protected)/owner/tenants/page.tsx:11:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

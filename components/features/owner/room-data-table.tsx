@@ -11,12 +11,13 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Database } from '@/types/supabase'
-import { Edit2, Trash2, Home, Users } from 'lucide-react'
+import { Edit2, Trash2, Home, Users, Settings2 } from 'lucide-react'
 import { RoomDialog } from './room-dialog'
 import { deleteRoom } from '@/actions/room'
 import { toast } from 'sonner'
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
+import { RoomDetailsDialog } from './room-details-dialog'
 
 type Room = Database['public']['Tables']['rooms']['Row']
 
@@ -26,6 +27,7 @@ interface RoomDataTableProps {
 
 export function RoomDataTable({ rooms }: RoomDataTableProps) {
     const [isDeleting, setIsDeleting] = useState<string | null>(null)
+    const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
 
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this room?")) return
@@ -104,6 +106,15 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
                                     </TableCell>
                                     <TableCell className="text-right pr-6">
                                         <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                onClick={() => setSelectedRoom(room)}
+                                            >
+                                                <Settings2 className="w-4 h-4" />
+                                            </Button>
+
                                             <RoomDialog mode="edit" room={room} trigger={
                                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
                                                     <Edit2 className="w-4 h-4" />
@@ -127,6 +138,16 @@ export function RoomDataTable({ rooms }: RoomDataTableProps) {
                     </TableBody>
                 </Table>
             </CardContent>
+
+            {selectedRoom && (
+                <RoomDetailsDialog
+                    isOpen={!!selectedRoom}
+                    onOpenChange={(open) => !open && setSelectedRoom(null)}
+                    roomId={selectedRoom.id}
+                    roomName={selectedRoom.name || 'Room'}
+                    currentPrice={selectedRoom.price_per_month || 0}
+                />
+            )}
         </Card>
     )
 }

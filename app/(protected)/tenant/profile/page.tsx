@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { DashboardShell } from '@/components/shared/dashboard-shell'
 import { Button } from '@/components/ui/button'
 import { TenantProfileForm } from '@/components/features/tenant/profile-form'
+import { PasswordChangeForm } from '@/components/features/shared/password-change-form'
 
 export default async function TenantProfilePage() {
   const supabase = await createClient()
@@ -38,7 +39,10 @@ export default async function TenantProfilePage() {
         <span>Back to home</span>
       </div>
 
-      <TenantProfileForm fullName={profile?.full_name ?? null} email={user.email ?? null} />
+      <div className="space-y-6">
+        <TenantProfileForm fullName={profile?.full_name ?? null} email={user.email ?? null} />
+        <PasswordChangeForm />
+      </div>
     </DashboardShell>
   )
 }
