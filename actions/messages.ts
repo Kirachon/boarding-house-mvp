@@ -177,53 +177,62 @@ export async function createDirectChannel(otherUserId: string) {
 
     // Check if channel already exists
     // Complex query: find a direct channel where both are members
-    // For now, let's just use the RPC approach or simplistic "find all my direct channels and check members"
-    // Since we filtered migration to be unique pairs, we should be careful.
 
-    // Easier: Just try to call a dedicated postgres function if possible.
-    // Or client-side logic: getChannels -> check `other_user.id`.
+    if (!user) return { error: 'Unauthorized' }
 
-    // Let's assume the caller checked locally first, but double check here.
-    const { data: myChannels } = await supabase
-        .from('channel_members')
-        .select('channel_id, channel:chat_channels(type)')
-        .eq('user_id', user.id)
+    try {
+        // 1. Check if channel already exists
+        // We need to find a direct channel where both users are members
+        // This is a bit complex with RLS, but we can try to find a channel
+        // where we are a member, and the other user is also a member.
 
-    const directChannelIds = myChannels?.filter((mc: any) => mc.channel.type === 'direct').map((mc: any) => mc.channel_id) || []
-
-    if (directChannelIds.length > 0) {
-        const { data: existing } = await supabase
+        // Simpler approach: Fetch my direct channels, and check if other user is in them
+        const { data: myChannels } = await supabase
             .from('channel_members')
-            .select('channel_id')
-            .in('channel_id', directChannelIds)
-            .eq('user_id', otherUserId)
-            .single()
+            .select('channel_id, channel:chat_channels(id, type)')
+            .eq('user_id', user.id)
 
-        if (existing) {
-            return { data: existing.channel_id }
+        if (myChannels) {
+            const directChannelIds = myChannels
+                .filter((m: any) => m.channel.type === 'direct')
+                .map((m: any) => m.channel_id)
+
+            if (directChannelIds.length > 0) {
+                // Check if other user is in any of these
+                const { data: existing } = await supabase
+                    .from('channel_members')
+                    .select('channel_id')
+                    .eq('user_id', otherUserId)
+                    .in('channel_id', directChannelIds)
+                    .limit(1)
+                    .single()
+
+                if (existing) {
+                    return { data: existing.channel_id }
+                }
+            }
         }
+
+        // 2. Create new channel via RPC to bypass RLS issues
+        // The RPC handles creating the channel and adding both members transactionally
+        const { data: channelId, error } = await supabase
+            .rpc('create_chat_channel', {
+                p_type: 'direct',
+                p_name: null, // Direct channels don't strictly need names
+                p_other_user_id: otherUserId
+            })
+
+        if (error) {
+            console.error('RPC Error:', error)
+            return { error: error.message }
+        }
+
+        return { data: channelId }
+
+    } catch (error) {
+        console.error('Error creating channel:', error)
+        return { error: 'Failed to create channel' }
     }
-
-    // Create new
-    const { data: channel, error: createError } = await supabase
-        .from('chat_channels')
-        .insert({ type: 'direct' })
-        .select()
-        .single()
-
-    if (createError) return { error: createError.message }
-
-    // Add members
-    const { error: memberError } = await supabase
-        .from('channel_members')
-        .insert([
-            { channel_id: channel.id, user_id: user.id },
-            { channel_id: channel.id, user_id: otherUserId }
-        ])
-
-    if (memberError) return { error: memberError.message }
-
-    return { data: channel.id }
 }
 
 export async function markChannelRead(channelId: string) {
